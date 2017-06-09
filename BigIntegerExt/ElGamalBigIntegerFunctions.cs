@@ -82,9 +82,9 @@ namespace BigIntegerExt
         public static int BitCount(this BigInteger T)
         {
             var data = T.ToByteArray();
-            uint value = data[data.Length - 1];
-            uint mask = 0x80;
-            int bits = 8;
+            byte value = data[data.Length - 1];
+            byte mask = 0x80;
+            var bits = 8;
 
             while (bits > 0 && (value & mask) == 0)
             {
@@ -92,7 +92,7 @@ namespace BigIntegerExt
                 mask >>= 1;
             }
 
-            bits += ((data.Length - 1) << 3);
+            bits += (data.Length - 1) << 3;
 
             return bits == 0 ? 1 : bits;
         }
@@ -143,12 +143,15 @@ namespace BigIntegerExt
         /// <summary>
         /// Generates a positive BigInteger that is probably prime (secured version)
         /// </summary>
-        /// <param name="bits">Number of bit</param>
+        /// <param name="bits">Number of bits; has to be greater than 1</param>
         /// <param name="confidence">Number of chosen bases</param>
         /// <param name="rand">RNGCryptoServiceProvider object</param>
         /// <returns>A probably prime number</returns>
         public static BigInteger GenPseudoPrime(this BigInteger T, int bits, int confidence, RNGCryptoServiceProvider rand)
         {
+            if (bits < 2)
+                throw new ArgumentOutOfRangeException(nameof(bits), bits, "GenPseudoPrime can only generate prime numbers of 2 bits or more");
+
             var result = new BigInteger();
             var done = false;
 

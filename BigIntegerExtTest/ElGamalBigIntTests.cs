@@ -41,7 +41,7 @@ namespace ElGamalTests
             }
         }
 
-        [TestMethod()]
+        [TestMethod]
         public void TestIsProbablePrime()
         {
             Assert.IsFalse(BigInteger.Zero.IsProbablePrime(10));
@@ -55,7 +55,7 @@ namespace ElGamalTests
                                 $"{i} is prime is {BigIntegerExt.BigIntegerExt.PrimesBelow2000.Contains(i)} but was evaluated as {res}");
             }
 
-            foreach (var p in new[] {633910111, 838041647, 15485863, 452930477, 28122569887267, 29996224275833 })
+            foreach (var p in new[] { 633910111, 838041647, 15485863, 452930477, 28122569887267, 29996224275833 })
             {
                 Assert.IsTrue((new BigInteger(p)).IsProbablePrime(10));
             }
@@ -112,13 +112,15 @@ namespace ElGamalTests
             var rand = new Random();
 
             // Test arbitrary values 
-            for (var i = 0; i < 30; i++)
+            for (var i = 0; i < 200; i++)
             {
-                var prime = bi.GenPseudoPrime(rand.Next(1, 512), 2, rng);
+                var prime = bi.GenPseudoPrime(rand.Next(2, 768), 2, rng);
 
                 foreach (var pr in BigIntegerExt.BigIntegerExt.PrimesBelow2000)
                 {
-                    Assert.IsTrue(prime != pr && prime % pr != 0);
+                    Assert.IsTrue(prime == pr || (prime != pr && prime % pr != 0),
+                                  $"prime: {prime}{Environment.NewLine}" +
+                                  $"pr:    {pr}");
                 }
             }
         }
