@@ -5,10 +5,10 @@ using System.Linq;
 using System.Numerics;
 using System.Security.Cryptography;
 
-namespace ElGamalTests
+namespace BigIntegerExtTests
 {
     [TestClass]
-    public class ElGamalBigInt
+    public class BigIntegerExtTests
     {
         [TestMethod]
         public void TestModInverse()
