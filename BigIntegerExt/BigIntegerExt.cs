@@ -1,16 +1,10 @@
 ﻿/************************************************************************************
- This implementation of the ElGamal encryption scheme is based on the code from [1].
+ This library is an extension for the .NET implementation of BigInteger. It provides
+ some of the missing functionality.
 
- This library is provided as-is and is covered by the MIT License [2] (except for the
- parts that belong to O'Reilly - they are covered by [3]).
+ This library is provided as-is and is covered by the MIT License [1].
 
- [1] Adam Freeman & Allen Jones, Programming .NET Security: O'Reilly Media, 2003,
-     ISBN 9780596552275 (http://books.google.com.sg/books?id=ykXCNVOIEuQC)
-
- [2] The MIT License (MIT), website, (http://opensource.org/licenses/MIT)
-
- [3] Tim O'Reilly, O'Reilly Policy on Re-Use of Code Examples from Books: website,
-     2001, (http://www.oreillynet.com/pub/a/oreilly/ask_tim/2001/codepolicy.html)
+ [1] The MIT License (MIT), website, (http://opensource.org/licenses/MIT)
  ************************************************************************************/
 
 using System;
@@ -82,9 +76,9 @@ namespace BigIntegerExt
         public static int BitCount(this BigInteger T)
         {
             var data = T.ToByteArray();
-            uint value = data[data.Length - 1];
-            uint mask = 0x80;
-            int bits = 8;
+            byte value = data[data.Length - 1];
+            byte mask = 0x80;
+            var bits = 8;
 
             while (bits > 0 && (value & mask) == 0)
             {
@@ -92,14 +86,14 @@ namespace BigIntegerExt
                 mask >>= 1;
             }
 
-            bits += ((data.Length - 1) << 3);
+            bits += (data.Length - 1) << 3;
 
             return bits == 0 ? 1 : bits;
         }
 
 
         /// <summary>
-        /// Populates "this" with the specified amount of random bits (secured version)
+        /// Returns the specified amount of random bits generated using crypotographically strong RNG
         /// </summary>
         /// <param name="bits"></param>
         /// <param name="rng"></param>
@@ -143,12 +137,15 @@ namespace BigIntegerExt
         /// <summary>
         /// Generates a positive BigInteger that is probably prime (secured version)
         /// </summary>
-        /// <param name="bits">Number of bit</param>
+        /// <param name="bits">Number of bits; has to be greater than 1</param>
         /// <param name="confidence">Number of chosen bases</param>
         /// <param name="rand">RNGCryptoServiceProvider object</param>
         /// <returns>A probably prime number</returns>
         public static BigInteger GenPseudoPrime(this BigInteger T, int bits, int confidence, RNGCryptoServiceProvider rand)
         {
+            if (bits < 2)
+                throw new ArgumentOutOfRangeException(nameof(bits), bits, "GenPseudoPrime can only generate prime numbers of 2 bits or more");
+
             var result = new BigInteger();
             var done = false;
 
