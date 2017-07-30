@@ -36,10 +36,7 @@ namespace BigIntegerExtTests
 
                 var inv = bi.ModInverse(mod);
 
-                Assert.Equal(bi != 0 ? 1 : 0, (bi * inv) % mod);
-                Console.WriteLine("bi:  " + bi);
-                Console.WriteLine("mod:  " + mod);
-                Console.WriteLine("inv:  " + inv);
+                Assert.True((bi != 0 ? 1 : 0) == ((bi * inv) % mod), $"{Environment.NewLine}bi:  {bi}{Environment.NewLine}mod: {mod}{Environment.NewLine}inv: {inv}");
             }
         }
 
@@ -52,8 +49,7 @@ namespace BigIntegerExtTests
             for (var i = 2; i < 2000; i++) // since we have an array of primes below 2000 that we can check against
             {
                 var res = (new BigInteger(i)).IsProbablePrime(10);
-                Assert.Equal(BigIntegerExt.BigIntegerExt.PrimesBelow2000.Contains(i), res);
-                Console.WriteLine(i + " is prime is " + BigIntegerExt.BigIntegerExt.PrimesBelow2000.Contains(i) + " but was evaluated as " + res);
+                Assert.True(BigIntegerExt.BigIntegerExt.PrimesBelow2000.Contains(i) == res, $"{i} is prime is {BigIntegerExt.BigIntegerExt.PrimesBelow2000.Contains(i)} but was evaluated as {res}");
             }
 
             foreach (var p in new[] { 633910111, 838041647, 15485863, 452930477, 28122569887267, 29996224275833 })
