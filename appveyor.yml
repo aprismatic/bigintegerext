@@ -22,6 +22,8 @@ environment:
 image: "Visual Studio 2017"
 nuget:
   disable_publish_on_pr: true
+test_script:
+  - dotnet test "BigIntegerExtTest" -c %CONFIGURATION%
 on_success:
   -
     ps: |
