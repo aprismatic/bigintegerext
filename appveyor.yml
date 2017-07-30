@@ -11,6 +11,8 @@ branches:
 build:
   publish_nuget: true
   verbosity: minimal
+before_build:
+  - nuget restore
 configuration: Release
 environment:
   AppVeyorAPIToken:
@@ -23,7 +25,7 @@ image: "Visual Studio 2017"
 nuget:
   disable_publish_on_pr: true
 test_script:
-  - dotnet test "BigIntegerExtTest" -c %CONFIGURATION%
+  - dotnet test "BigIntegerExtTest"
 on_success:
   -
     ps: |
