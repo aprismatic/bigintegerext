@@ -5,15 +5,7 @@ assembly_info:
   assembly_version: "{version}"
   file: "**\\AssemblyInfo.*"
   patch: true
-install:
-  # Download .NET Core 2.0 Preview 3 SDK and add to PATH
-  - ps: $urlCurrent = "https://dotnetcli.azureedge.net/dotnet/Sdk/2.0.0-preview3-006857/dotnet-sdk-2.0.0-preview3-006857-win-x64.zip"
-  - ps: $env:DOTNET_INSTALL_DIR = "$pwd\.dotnetsdk"
-  - ps: mkdir $env:DOTNET_INSTALL_DIR -Force | Out-Null
-  - ps: $tempFileCurrent = [System.IO.Path]::Combine([System.IO.Path]::GetTempPath(), [System.IO.Path]::GetRandomFileName())
-  - ps: (New-Object System.Net.WebClient).DownloadFile($urlCurrent, $tempFileCurrent)
-  - ps: Add-Type -AssemblyName System.IO.Compression.FileSystem; [System.IO.Compression.ZipFile]::ExtractToDirectory($tempFileCurrent, $env:DOTNET_INSTALL_DIR)
-  - ps: $env:Path = "$env:DOTNET_INSTALL_DIR;$env:Path"
+image: Visual Studio 2017 Preview
 branches:
   only:
     - master
