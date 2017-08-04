@@ -26,12 +26,12 @@ namespace BigIntegerExtTests
             {
                 var rnd = new Random();
                 var bi = new BigInteger();
-                bi = bi.GenRandomBits(rnd.Next(1, 1024), new RNGCryptoServiceProvider());
+                bi = bi.GenRandomBits(rnd.Next(1, 1024), RandomNumberGenerator.Create());
 
-                var mod = bi.GenRandomBits(rnd.Next(1, 128), new RNGCryptoServiceProvider());
+                var mod = bi.GenRandomBits(rnd.Next(1, 128), RandomNumberGenerator.Create());
                 while ((BigInteger.GreatestCommonDivisor(bi, mod) != 1) || (mod <= 1))
                 {
-                    mod = mod.GenRandomBits(rnd.Next(1, 128), new RNGCryptoServiceProvider());
+                    mod = mod.GenRandomBits(rnd.Next(1, 128), RandomNumberGenerator.Create());
                 }
 
                 var inv = bi.ModInverse(mod);
@@ -66,7 +66,7 @@ namespace BigIntegerExtTests
         [Fact]
         public void TestSecuredGenRandomBits()
         {
-            var rng = new RNGCryptoServiceProvider();
+            var rng = RandomNumberGenerator.Create();
             var rand = new Random();
 
             for (var i = 0; i < 9999; i++)
@@ -105,7 +105,7 @@ namespace BigIntegerExtTests
         public void TestGenPseudoPrime()
         {
             var bi = new BigInteger();
-            var rng = new RNGCryptoServiceProvider();
+            var rng = RandomNumberGenerator.Create();
             var rand = new Random();
 
             // Test arbitrary values 

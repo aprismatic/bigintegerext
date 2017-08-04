@@ -97,7 +97,7 @@ namespace BigIntegerExt
         /// </summary>
         /// <param name="bits"></param>
         /// <param name="rng"></param>
-        public static BigInteger GenRandomBits(this BigInteger T, int bits, RNGCryptoServiceProvider rng)
+        public static BigInteger GenRandomBits(this BigInteger T, int bits, RandomNumberGenerator rng)
         {
             if (bits <= 0)
                 throw new ArithmeticException("Number of required bits is not valid.");
@@ -141,7 +141,7 @@ namespace BigIntegerExt
         /// <param name="confidence">Number of chosen bases</param>
         /// <param name="rand">RNGCryptoServiceProvider object</param>
         /// <returns>A probably prime number</returns>
-        public static BigInteger GenPseudoPrime(this BigInteger T, int bits, int confidence, RNGCryptoServiceProvider rand)
+        public static BigInteger GenPseudoPrime(this BigInteger T, int bits, int confidence, RandomNumberGenerator rand)
         {
             if (bits < 2)
                 throw new ArgumentOutOfRangeException(nameof(bits), bits, "GenPseudoPrime can only generate prime numbers of 2 bits or more");
@@ -224,7 +224,7 @@ namespace BigIntegerExt
             // There is no built-in method for generating random BigInteger values.
             // Instead, random BigIntegers are constructed from randomly generated
             // byte arrays of the same length as the w.
-            var rng = new RNGCryptoServiceProvider();
+            var rng = RandomNumberGenerator.Create();
             var wlen = w.BitCount();
             var b = BigInteger.Zero;
 

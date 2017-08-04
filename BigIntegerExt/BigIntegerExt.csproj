@@ -1,9 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net40</TargetFramework>
+    <TargetFramework>netstandard2.0</TargetFramework>
     <Description>A set of extensions for the .NET BigInteger class</Description>
     <Company>Nanyang Technological Unviersity</Company>
-    <Product>BigIntegerExt.Properties</Product>
+    <Product>BigIntegerExt</Product>
     <Authors>Vasily Sidorov (bazzilic)</Authors>
   </PropertyGroup>
 </Project>
