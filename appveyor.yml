@@ -5,7 +5,6 @@ assembly_info:
   assembly_version: "{version}"
   file: "**\\AssemblyInfo.*"
   patch: true
-image: Visual Studio 2017 Preview
 branches:
   only:
     - master
@@ -22,7 +21,7 @@ environment:
     secure: XaWtuymf7dtXgjvEdnxXZVuIGVwMYUqOcE3dl3f3JzA=
   NugetAPIToken:
     secure: U630adFlFmWqwvorvfwA+YvFtAkfL+vw1EX0vCXbyk+R6qiLkIeqKek9yK+poBjV
-image: "Visual Studio 2017"
+image: "Visual Studio 2017 Preview"
 nuget:
   disable_publish_on_pr: true
 on_success:
