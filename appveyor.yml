@@ -23,10 +23,9 @@ environment:
     secure: U630adFlFmWqwvorvfwA+YvFtAkfL+vw1EX0vCXbyk+R6qiLkIeqKek9yK+poBjV
 image: "Visual Studio 2017 Preview"
 build_script:
-  - ps: >-
-    dotnet restore
-    dotnet build
-    dotnet test
+  - ps: dotnet restore
+  - ps: dotnet build
+  - ps: dotnet test
 nuget:
   disable_publish_on_pr: true
 on_success:
