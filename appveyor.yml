@@ -28,6 +28,8 @@ environment:
 image: "Visual Studio 2017 Preview"
 nuget:
   disable_publish_on_pr: true
+artifacts:
+  - path: '**\*.nupkg'
 on_success:
   -
     ps: |
