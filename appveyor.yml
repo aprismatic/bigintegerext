@@ -13,6 +13,8 @@ build:
   verbosity: minimal
 before_build:
   - nuget restore
+test_script:
+  - ps: dotnet test .\BigIntegerExtTest\BigIntegerExtTest.csproj --no-build
 configuration: Release
 environment:
   AppVeyorAPIToken:
@@ -22,10 +24,6 @@ environment:
   NugetAPIToken:
     secure: U630adFlFmWqwvorvfwA+YvFtAkfL+vw1EX0vCXbyk+R6qiLkIeqKek9yK+poBjV
 image: "Visual Studio 2017 Preview"
-build_script:
-  - ps: dotnet restore
-  - ps: dotnet build
-  - ps: dotnet test .\BigIntegerExtTest\BigIntegerExtTest.csproj --no-build
 nuget:
   disable_publish_on_pr: true
 on_success:
