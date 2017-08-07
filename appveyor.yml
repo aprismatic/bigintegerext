@@ -1,10 +1,9 @@
 ---
-# assembly_info:
-#   assembly_file_version: "{version}"
-#   assembly_informational_version: "{version}"
-#   assembly_version: "{version}"
-#   file: "**\\AssemblyInfo.*"
-#   patch: true
+dotnet_csproj:
+  patch: true
+  file: '**\*.csproj'
+  version: '{version}'
+  package_version: '{version}'
 branches:
   only:
     - master
@@ -13,12 +12,10 @@ build:
   verbosity: minimal
 before_build:
   - nuget restore
-build_script:
-  - ps: dotnet build /p:Version=$Env:APPVEYOR_BUILD_VERSION
 after_build:
-  - ps: dotnet pack .\BigIntegerExt\BigIntegerExt.csproj --configuration Release --no-build
+  - dotnet pack .\BigIntegerExt\BigIntegerExt.csproj --configuration Release --no-build
 test_script:
-  - ps: dotnet test .\BigIntegerExtTest\BigIntegerExtTest.csproj --no-build
+  - dotnet test .\BigIntegerExtTest\BigIntegerExtTest.csproj --no-build
 configuration: Release
 environment:
   AppVeyorAPIToken:
