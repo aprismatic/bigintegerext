@@ -25,7 +25,7 @@ image: "Visual Studio 2017 Preview"
 build_script:
   - ps: dotnet restore
   - ps: dotnet build
-  - ps: dotnet test
+  - ps: dotnet test .\BigIntegerExtTest\BigIntegerExtTest.csproj --no-build
 nuget:
   disable_publish_on_pr: true
 on_success:

@@ -22,16 +22,25 @@ namespace BigIntegerExtTests
                 Assert.Equal("1814", b.ToString());
             }
 
+            var rng = RandomNumberGenerator.Create();
+            var rnd = new Random();
+
             for (var i = 0; i < 9999; i++)
             {
-                var rnd = new Random();
                 var bi = new BigInteger();
-                bi = bi.GenRandomBits(rnd.Next(1, 1024), RandomNumberGenerator.Create());
+                bi = bi.GenRandomBits(rnd.Next(1, 1024), rng);
 
-                var mod = bi.GenRandomBits(rnd.Next(1, 128), RandomNumberGenerator.Create());
+                var mod = bi.GenRandomBits(rnd.Next(1, 128), rng);
+                int j = 0;
                 while ((BigInteger.GreatestCommonDivisor(bi, mod) != 1) || (mod <= 1))
                 {
-                    mod = mod.GenRandomBits(rnd.Next(1, 128), RandomNumberGenerator.Create());
+                    mod = mod.GenRandomBits(rnd.Next(1, 128), rng);
+                    j++;
+                    if (j > 1000)
+                    {
+                        bi = bi.GenRandomBits(rnd.Next(1, 1024), rng);
+                        j = 0;
+                    }
                 }
 
                 var inv = bi.ModInverse(mod);
