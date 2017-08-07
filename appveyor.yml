@@ -12,8 +12,6 @@ build:
   verbosity: minimal
 before_build:
   - nuget restore
-after_build:
-  - dotnet pack .\BigIntegerExt\BigIntegerExt.csproj --configuration Release --no-build
 test_script:
   - dotnet test .\BigIntegerExtTest\BigIntegerExtTest.csproj --no-build
 configuration: Release
@@ -27,8 +25,6 @@ environment:
 image: "Visual Studio 2017 Preview"
 nuget:
   disable_publish_on_pr: true
-artifacts:
-  - path: '**\*.nupkg'
 on_success:
   -
     ps: |
