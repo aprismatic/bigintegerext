@@ -16,7 +16,7 @@ before_build:
     ps: |
         $path = (Get-Item .\BigIntegerExt\BigIntegerExt.csproj).FullName
         $csproj = [xml](Get-Content $path)
-        $csproj.Project.PropertyGroup.Version = $Env:APPVEYOR_BUILD_VERSION
+        $csproj.Project.PropertyGroup.PackageVersion = $Env:APPVEYOR_BUILD_VERSION
         $csproj.Save($path)
 after_build:
   - dotnet pack .\BigIntegerExt\BigIntegerExt.csproj --configuration Release --no-build
