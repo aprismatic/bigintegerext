@@ -1,10 +1,10 @@
 ---
-assembly_info:
-  assembly_file_version: "{version}"
-  assembly_informational_version: "{version}"
-  assembly_version: "{version}"
-  file: "**\\AssemblyInfo.*"
-  patch: true
+# assembly_info:
+#   assembly_file_version: "{version}"
+#   assembly_informational_version: "{version}"
+#   assembly_version: "{version}"
+#   file: "**\\AssemblyInfo.*"
+#   patch: true
 branches:
   only:
     - master
@@ -13,6 +13,8 @@ build:
   verbosity: minimal
 before_build:
   - nuget restore
+build_script:
+  - ps: dotnet build /p:Version=$Env:APPVEYOR_BUILD_VERSION
 test_script:
   - ps: dotnet test .\BigIntegerExtTest\BigIntegerExtTest.csproj --no-build
 configuration: Release
