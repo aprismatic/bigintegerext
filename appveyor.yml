@@ -21,7 +21,7 @@ environment:
   AppVeyorGlobalAPIToken:
     secure: XaWtuymf7dtXgjvEdnxXZVuIGVwMYUqOcE3dl3f3JzA=
   NugetAPIToken:
-    secure: U630adFlFmWqwvorvfwA+YvFtAkfL+vw1EX0vCXbyk+R6qiLkIeqKek9yK+poBjV
+    secure: E6bnGAtF+Czk4Pl7A+2lsUCrk5bogPaddLeXcIlURvWypgjZYGVvkBVwj02ml/tU
 image: "Visual Studio 2017 Preview"
 nuget:
   disable_publish_on_pr: true
