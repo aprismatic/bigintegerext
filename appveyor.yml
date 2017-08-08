@@ -1,16 +1,19 @@
 ---
-assembly_info:
-  assembly_file_version: "{version}"
-  assembly_informational_version: "{version}"
-  assembly_version: "{version}"
-  file: "**\\AssemblyInfo.*"
+dotnet_csproj:
   patch: true
+  file: '**\*.csproj'
+  version: '{version}'
+  package_version: '{version}'
 branches:
   only:
     - master
 build:
   publish_nuget: true
   verbosity: minimal
+before_build:
+  - nuget restore
+test_script:
+  - dotnet test .\BigIntegerExtTest\BigIntegerExtTest.csproj --no-build
 configuration: Release
 environment:
   AppVeyorAPIToken:
@@ -18,8 +21,8 @@ environment:
   AppVeyorGlobalAPIToken:
     secure: XaWtuymf7dtXgjvEdnxXZVuIGVwMYUqOcE3dl3f3JzA=
   NugetAPIToken:
-    secure: U630adFlFmWqwvorvfwA+YvFtAkfL+vw1EX0vCXbyk+R6qiLkIeqKek9yK+poBjV
-image: "Visual Studio 2017"
+    secure: E6bnGAtF+Czk4Pl7A+2lsUCrk5bogPaddLeXcIlURvWypgjZYGVvkBVwj02ml/tU
+image: "Visual Studio 2017 Preview"
 nuget:
   disable_publish_on_pr: true
 on_success:
