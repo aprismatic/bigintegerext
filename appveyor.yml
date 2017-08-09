@@ -13,8 +13,6 @@ build:
   publish_nuget: true
   publish_nuget_symbols: true
   verbosity: minimal
-test_script:
-  - dotnet test .\BigIntegerExtTest\BigIntegerExtTest.csproj --no-build
 configuration: Release
 environment:
   AppVeyorAPIToken:
