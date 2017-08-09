@@ -11,6 +11,7 @@ before_build:
   - nuget restore
 build:
   publish_nuget: true
+  publish_nuget_symbols: true
   verbosity: minimal
 test_script:
   - dotnet test .\BigIntegerExtTest\BigIntegerExtTest.csproj --no-build
@@ -43,4 +44,4 @@ on_success:
         }
 
         rm .\*.nupkg
-version: "0.1.0.{build}"
+version: "0.1.1.{build}"
