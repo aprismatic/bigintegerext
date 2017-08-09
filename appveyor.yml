@@ -7,14 +7,12 @@ dotnet_csproj:
 branches:
   only:
     - master
+before_build:
+  - nuget restore
 build:
   publish_nuget: true
   publish_nuget_symbols: true
   verbosity: minimal
-before_build:
-  - nuget restore
-test_script:
-  - dotnet test .\BigIntegerExtTest\BigIntegerExtTest.csproj --no-build
 configuration: Release
 environment:
   AppVeyorAPIToken:

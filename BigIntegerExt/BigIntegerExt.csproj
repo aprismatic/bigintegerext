@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netstandard1.6</TargetFramework>
-    <PackageVersion>0.1.0.0</PackageVersion>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <PackageVersion>0.1.1.0</PackageVersion>
     <Description>A set of extensions for the .NET BigInteger class</Description>
     <Company>Nanyang Technological Unviersity</Company>
     <Product>BigIntegerExt</Product>
