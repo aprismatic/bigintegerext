@@ -40,7 +40,7 @@ init:
             ($env:APPVEYOR_REPO_BRANCH -eq 'master') -And `
             ($env:APPVEYOR_PULL_REQUEST_NUMBER -eq $null) ) # new version release
         {
-          Invoke-RestMethod -Uri 'https://ci.appveyor.com/api/projects/bazzilic/PaillierExt/settings/build-number' `
+          Invoke-RestMethod -Uri 'https://ci.appveyor.com/api/projects/bazzilic/BigIntegerExt/settings/build-number' `
                             -Headers @{ "Authorization" = "Bearer ${env:AppVeyorAPIToken}" ; "Content-type" = "application/json" } `
                             -Method Put `
                             -Body '{ nextBuildNumber: 1 }'
