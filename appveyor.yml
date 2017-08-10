@@ -26,7 +26,9 @@ deploy:
     secure: E6bnGAtF+Czk4Pl7A+2lsUCrk5bogPaddLeXcIlURvWypgjZYGVvkBVwj02ml/tU
   skip_symbols: false
   on:
-    THIS_IS_VERSION_RELEASE: 'true'
+    APPVEYOR_REPO_TAG_NAME: /^v\d+\.\d+\.\d+$/
+    APPVEYOR_REPO_BRANCH: 'master'
+    APPVEYOR_PULL_REQUEST_NUMBER: ''
 environment:
   AppVeyorAPIToken:
     secure: GvygCCndEp8eiXvItooIyglWYnyfUvg4YNyaufw3N3A=
@@ -38,7 +40,6 @@ init:
             ($env:APPVEYOR_REPO_BRANCH -eq 'master') -And `
             ($env:APPVEYOR_PULL_REQUEST_NUMBER -eq $null) ) # new version release
         {
-          [Environment]::SetEnvironmentVariable("THIS_IS_VERSION_RELEASE", "true", "Machine")
           Invoke-RestMethod -Uri 'https://ci.appveyor.com/api/projects/bazzilic/PaillierExt/settings/build-number' `
                             -Headers @{ "Authorization" = "Bearer ${env:AppVeyorAPIToken}" ; "Content-type" = "application/json" } `
                             -Method Put `
