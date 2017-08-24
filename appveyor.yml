@@ -19,6 +19,8 @@ configuration: Release
 image: "Visual Studio 2017 Preview"
 nuget:
   disable_publish_on_pr: true
+cache:
+  - packages
 deploy:
   provider: NuGet
   server: https://www.nuget.org/api/v2/package
