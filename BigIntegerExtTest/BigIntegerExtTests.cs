@@ -9,7 +9,7 @@ namespace BigIntegerExtTests
 {
     public class BigIntegerExtTests
     {
-        [Fact]
+        [Fact(DisplayName = "ModInverse")]
         public void TestModInverse()
         {
             {
@@ -49,7 +49,7 @@ namespace BigIntegerExtTests
             }
         }
 
-        [Fact]
+        [Fact(DisplayName = "IsProbablePrime")]
         public void TestIsProbablePrime()
         {
             Assert.False(BigInteger.Zero.IsProbablePrime(10));
@@ -72,7 +72,7 @@ namespace BigIntegerExtTests
             }
         }
 
-        [Fact]
+        [Fact(DisplayName = "SecuredGenRandomBits")]
         public void TestSecuredGenRandomBits()
         {
             var rng = RandomNumberGenerator.Create();
@@ -110,7 +110,7 @@ namespace BigIntegerExtTests
             }
         }
 
-        [Fact]
+        [Fact(DisplayName = "GenPseudoPrime")]
         public void TestGenPseudoPrime()
         {
             var bi = new BigInteger();
