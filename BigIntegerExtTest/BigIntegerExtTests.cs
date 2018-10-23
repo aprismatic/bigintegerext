@@ -1,4 +1,4 @@
-﻿using BigIntegerExt;
+﻿using Aprismatic.BigIntegerExt;
 using System;
 using System.Linq;
 using System.Numerics;
@@ -58,7 +58,7 @@ namespace BigIntegerExtTests
             for (var i = 2; i < 2000; i++) // since we have an array of primes below 2000 that we can check against
             {
                 var res = (new BigInteger(i)).IsProbablePrime(10);
-                Assert.True(BigIntegerExt.BigIntegerExt.PrimesBelow2000.Contains(i) == res, $"{i} is prime is {BigIntegerExt.BigIntegerExt.PrimesBelow2000.Contains(i)} but was evaluated as {res}");
+                Assert.True(BigIntegerExt.PrimesBelow2000.Contains(i) == res, $"{i} is prime is {BigIntegerExt.PrimesBelow2000.Contains(i)} but was evaluated as {res}");
             }
 
             foreach (var p in new[] { 633910111, 838041647, 15485863, 452930477, 28122569887267, 29996224275833 })
@@ -122,7 +122,7 @@ namespace BigIntegerExtTests
             {
                 var prime = bi.GenPseudoPrime(rand.Next(2, 768), 2, rng);
 
-                foreach (var pr in BigIntegerExt.BigIntegerExt.PrimesBelow2000)
+                foreach (var pr in BigIntegerExt.PrimesBelow2000)
                 {
                     Assert.True(prime == pr || (prime != pr && prime % pr != 0),
                                   $"prime: {prime}{Environment.NewLine}" +

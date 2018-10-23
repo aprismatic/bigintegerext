@@ -11,7 +11,7 @@ using System;
 using System.Numerics;
 using System.Security.Cryptography;
 
-namespace BigIntegerExt
+namespace Aprismatic.BigIntegerExt
 {
     public static class BigIntegerExt
     {
@@ -93,7 +93,7 @@ namespace BigIntegerExt
 
 
         /// <summary>
-        /// Returns the specified amount of random bits generated using crypotographically strong RNG
+        /// Returns the specified amount of random bits generated using provided RNG
         /// </summary>
         /// <param name="bits"></param>
         /// <param name="rng"></param>
@@ -195,7 +195,7 @@ namespace BigIntegerExt
 
 
         /// <summary>
-        /// Probabilistic prime test based on Miller-Rabin's alogorithm.
+        /// Probabilistic prime test based on Miller-Rabin's algorithm.
         /// Algorithm based on http://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.186-4.pdf (p. 72)
         /// This method REQUIRES that the BigInteger is positive
         /// </summary>
