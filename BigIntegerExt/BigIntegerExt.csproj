@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;net461</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0</TargetFrameworks>
     <Version>0.1.1.0</Version>
     <Description>A set of extension methods for the .NET `System.Numerics.BigInteger` class, including methods like `ModInverse`, `GenPseudoPrime`, `GenRandomBits` (using cryptographically strong RNG), `IsProbablePrime` (implemented using Rabin-Miller test).</Description>
     <Company>Nanyang Technological Unviersity</Company>
