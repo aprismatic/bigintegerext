@@ -11,7 +11,7 @@ using System;
 using System.Numerics;
 using System.Security.Cryptography;
 
-namespace Aprismatic.BigIntegerExt
+namespace Aprismatic
 {
     public static class BigIntegerExt
     {
