@@ -7,7 +7,7 @@
     <PackageIcon>icon.png</PackageIcon>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageIconUrl>https://i.ibb.co/SmV2V0m/aprismatic.png</PackageIconUrl>
-    <RepositoryUrl>https://github.com/aprismatic/dotnet-template</RepositoryUrl>
+    <RepositoryUrl>https://github.com/aprismatic/bigintegerext</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>

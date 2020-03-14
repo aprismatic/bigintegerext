@@ -2,7 +2,7 @@ name: Release .NET NuGet
 
 on:
   release:
-    types: [published, created, edited]
+    types: [created]
 
 jobs:
   test:
