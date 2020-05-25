@@ -55,18 +55,18 @@ namespace BigIntegerExtTests
             Assert.False(BigInteger.Zero.IsProbablePrime(10));
             Assert.False(BigInteger.One.IsProbablePrime(10));
 
-            for (var i = 2; i < 2000; i++) // since we have an array of primes below 2000 that we can check against
+            for (var i = 2UL; i < 2000; i++) // since we have an array of primes below 2000 that we can check against
             {
                 var res = (new BigInteger(i)).IsProbablePrime(10);
                 Assert.True(BigIntegerExt.PrimesBelow2000.Contains(i) == res, $"{i} is prime is {BigIntegerExt.PrimesBelow2000.Contains(i)} but was evaluated as {res}");
             }
 
-            foreach (var p in new[] { 633910111, 838041647, 15485863, 452930477, 28122569887267, 29996224275833 })
+            foreach (var p in new[] { 633910111, 838041647, 15485863, 452930477, 28122569887267, 29996224275833, 571245373823500631 })
             {
                 Assert.True((new BigInteger(p)).IsProbablePrime(10));
             }
 
-            foreach (var p in new[] { 398012025725459, 60030484763 })
+            foreach (var p in new[] { 398012025725459, 60030484763, 571245373823500630 })
             {
                 Assert.False((new BigInteger(p)).IsProbablePrime(50));
             }
@@ -124,7 +124,7 @@ namespace BigIntegerExtTests
 
                 foreach (var pr in BigIntegerExt.PrimesBelow2000)
                 {
-                    Assert.True(prime == pr || (prime != pr && prime % pr != 0),
+                    Assert.True(prime == pr || prime % pr != 0,
                                   $"prime: {prime}{Environment.NewLine}" +
                                   $"pr:    {pr}");
                 }
