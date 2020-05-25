@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFrameworks>netstandard1.3;netstandard2.1</TargetFrameworks>
     <Description>A set of extension methods for the .NET `System.Numerics.BigInteger` class, including methods like `ModInverse`, `GenPseudoPrime`, `GenRandomBits` (using cryptographically strong RNG), `IsProbablePrime` (implemented using Rabin-Miller test).</Description>
   </PropertyGroup>
 </Project>
