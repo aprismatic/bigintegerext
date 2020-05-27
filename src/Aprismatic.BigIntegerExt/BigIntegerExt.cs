@@ -16,7 +16,7 @@ namespace Aprismatic
     public static class BigIntegerExt
     {
         // primes smaller than 2000 to test the generated prime number
-        public static readonly int[] PrimesBelow2000 = {
+        public static readonly ulong[] PrimesBelow2000 = {
            2,    3,    5,    7,   11,   13,   17,   19,   23,   29,   31,   37,   41,   43,   47,   53,   59,   61,   67,   71,
           73,   79,   83,   89,   97,  101,  103,  107,  109,  113,  127,  131,  137,  139,  149,  151,  157,  163,  167,  173,
          179,  181,  191,  193,  197,  199,  211,  223,  227,  229,  233,  239,  241,  251,  257,  263,  269,  271,  277,  281,
@@ -36,18 +36,18 @@ namespace Aprismatic
 
 
         /// <summary>
-        /// Returns the modulo inverse of this
+        /// Calculates the modulo inverse of this.
         /// </summary>
         /// <param name="mod">Modulo</param>
-        /// <returns>Modulo inverse of this</returns>
+        /// <returns>Modulo inverse of this; or 1 if mod.inv. does not exist.</returns>
         public static BigInteger ModInverse(this BigInteger T, BigInteger mod)
         {
-            BigInteger i = mod, v = 0, d = 1;
+            BigInteger i = mod, v = 0, d = 1, t, x;
 
-            while (T > 0)
+            while (T.Sign > 0)
             {
-                BigInteger t = i / T, x = T;
-                T = i % x;
+                x = T;
+                t = BigInteger.DivRem(i, T, out T);
                 i = x;
                 x = d;
                 d = v - t * x;
@@ -55,7 +55,7 @@ namespace Aprismatic
             }
 
             v %= mod;
-            if (v < 0)
+            if (v.Sign < 0)
                 v = (v + mod) % mod;
 
             return v;
@@ -175,19 +175,29 @@ namespace Aprismatic
             var thisVal = BigInteger.Abs(T);
             if (thisVal.IsZero || thisVal.IsOne) return false;
 
-            var val = (Int32) BigInteger.Min(Int32.MaxValue, thisVal);
-
-            // test for divisibility by primes < 2000
-            for (var i = 0; i < PrimesBelow2000.Length; i++)
+            if (thisVal <= UInt64.MaxValue)
             {
-                var divisor = PrimesBelow2000[i];
+                var uival = (UInt64) thisVal;
 
-                if (divisor >= val)
-                    return true;
 
-                var resultNum = BigInteger.Remainder(thisVal, divisor);
-                if (resultNum == BigInteger.Zero)
-                    return false;
+                for (var i = 0; i < PrimesBelow2000.Length; i++) // test for divisibility by primes < 2000
+                {
+                    var divisor = PrimesBelow2000[i];
+
+                    if (divisor >= uival)
+                        return true;
+
+                    if (uival % divisor == 0)
+                        return false;
+                }
+            }
+            else
+            {
+                for (var i = 0; i < PrimesBelow2000.Length; i++) // test for divisibility by primes < 2000
+                {
+                    if ((thisVal % PrimesBelow2000[i]).IsZero)
+                        return false;
+                }
             }
 
             return thisVal.RabinMillerTest(confidence);
@@ -212,13 +222,13 @@ namespace Aprismatic
         /// <returns>True if this is a strong pseudoprime to randomly chosen bases</returns>
         public static bool RabinMillerTest(this BigInteger w, int confidence)
         {
-            var m = w - 1;
+            var m = w - BigInteger.One;
             var a = 0;
 
-            while (m % 2 == 0)
+            while (m.IsEven)
             {
-                m /= 2;
-                a += 1;
+                m >>= 1;
+                a++;
             }
 
             // There is no built-in method for generating random BigInteger values.
@@ -226,24 +236,23 @@ namespace Aprismatic
             // byte arrays of the same length as the w.
             var rng = RandomNumberGenerator.Create();
             var wlen = w.BitCount();
-            var b = BigInteger.Zero;
+            BigInteger b;
 
             for (var i = 0; i < confidence; i++)
             {
                 do
                 {
-                    b = b.GenRandomBits(wlen, rng);
-                }
-                while (b < 2 || b >= w - 1);
+                    b = BigInteger.Zero.GenRandomBits(wlen, rng);
+                } while (b >= w - 1 || b < 2);
 
                 var z = BigInteger.ModPow(b, m, w);
-                if (z == 1 || z == w - 1)
+                if (z.IsOne || z == w - 1)
                     continue;
 
                 for (var j = 1; j < a; j++)
                 {
                     z = BigInteger.ModPow(z, 2, w);
-                    if (z == 1)
+                    if (z.IsOne)
                         return false;
                     if (z == w - 1)
                         break;
