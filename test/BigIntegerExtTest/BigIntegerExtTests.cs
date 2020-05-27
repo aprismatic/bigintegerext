@@ -13,13 +13,21 @@ namespace BigIntegerExtTests
         public void TestModInverse()
         {
             {
-                var a = new BigInteger();
-                BigInteger.TryParse("470782681346529800216759025446747092045188631141622615445464429840250748896490263346676188477401449398784352124574498378830506322639352584202116605974693692194824763263949618703029846313252400361025245824301828641617858127932941468016666971398736792667282916657805322080902778987073711188483372360907612588995664533157503380846449774089269965646418521613225981431666593065726252482995754339317299670566915780168", out a);
-                var b = a.ModInverse(new BigInteger(1000000007));
-                Assert.Equal("736445995", b.ToString());
+                var a = new BigInteger[] { 0, 0, 1, 3, 7, 25, 2, 13, 19, 31, 3 };
+                var m = new BigInteger[] { 1000000007, 1999, 2, 6, 87, 87, 91, 91, 1212393831, 73714876143, 73714876143 };
+                var r = new BigInteger[] { 736445995, 1814, 1, 1, 25, 7, 46, 1, 701912218, 45180085378, 1 };
 
-                b = a.ModInverse(new BigInteger(1999));
-                Assert.Equal("1814", b.ToString());
+                var t = new BigInteger();
+                BigInteger.TryParse("470782681346529800216759025446747092045188631141622615445464429840250748896490263346676188477401449398784352124574498378830506322639352584202116605974693692194824763263949618703029846313252400361025245824301828641617858127932941468016666971398736792667282916657805322080902778987073711188483372360907612588995664533157503380846449774089269965646418521613225981431666593065726252482995754339317299670566915780168", out t);
+                a[0] = t; a[1] = t;
+
+                Assert.Equal(a.Length, m.Length);
+                Assert.Equal(m.Length, r.Length);
+
+                for (var i = 0; i < a.Length; i++)
+                {
+                    Assert.Equal(r[i], a[i].ModInverse(m[i]));
+                }
             }
 
             var rng = RandomNumberGenerator.Create();
@@ -28,24 +36,22 @@ namespace BigIntegerExtTests
             for (var i = 0; i < 9999; i++)
             {
                 var bi = new BigInteger();
-                bi = bi.GenRandomBits(rnd.Next(1, 1024), rng);
-
-                var mod = bi.GenRandomBits(rnd.Next(1, 128), rng);
-                int j = 0;
-                while ((BigInteger.GreatestCommonDivisor(bi, mod) != 1) || (mod <= 1))
+                var mod = new BigInteger();
+                var j = 9999;
+                while (BigInteger.GreatestCommonDivisor(bi, mod) != 1 || mod <= 1)
                 {
-                    mod = mod.GenRandomBits(rnd.Next(1, 128), rng);
-                    j++;
-                    if (j > 1000)
+                    if (++j > 1000)
                     {
                         bi = bi.GenRandomBits(rnd.Next(1, 1024), rng);
                         j = 0;
                     }
+                    mod = mod.GenRandomBits(rnd.Next(1, 128), rng);
                 }
 
                 var inv = bi.ModInverse(mod);
 
-                Assert.True((bi != 0 ? 1 : 0) == ((bi * inv) % mod), $"{Environment.NewLine}bi:  {bi}{Environment.NewLine}mod: {mod}{Environment.NewLine}inv: {inv}");
+                Assert.True((bi != 0 ? 1 : 0) == bi * inv % mod,
+                    $"{Environment.NewLine}bi:  {bi}{Environment.NewLine}mod: {mod}{Environment.NewLine}inv: {inv}");
             }
         }
 

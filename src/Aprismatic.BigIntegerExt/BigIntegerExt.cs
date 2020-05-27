@@ -36,10 +36,10 @@ namespace Aprismatic
 
 
         /// <summary>
-        /// Returns the modulo inverse of this
+        /// Calculates the modulo inverse of this.
         /// </summary>
         /// <param name="mod">Modulo</param>
-        /// <returns>Modulo inverse of this</returns>
+        /// <returns>Modulo inverse of this; or 1 if mod.inv. does not exist.</returns>
         public static BigInteger ModInverse(this BigInteger T, BigInteger mod)
         {
             BigInteger i = mod, v = 0, d = 1, t, x;
