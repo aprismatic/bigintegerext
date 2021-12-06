@@ -42,7 +42,7 @@ namespace Aprismatic
         /// <returns>Modulo inverse of this; or 1 if mod.inv. does not exist.</returns>
         public static BigInteger ModInverse(this BigInteger T, BigInteger mod)
         {
-            BigInteger i = mod, v = 0, d = 1, t, x;
+            BigInteger i = mod, v = BigInteger.Zero, d = BigInteger.One, t, x;
 
             while (T.Sign > 0)
             {
@@ -54,16 +54,16 @@ namespace Aprismatic
                 v = x;
             }
 
-            v %= mod;
+            v %= mod; // TODO: this could be faster (?)
             if (v.Sign < 0)
-                v = (v + mod) % mod;
+                v = (v + mod) % mod; // TODO: this too (?)
 
             return v;
         }
 
 
         /// <summary>
-        /// Returns the position of the most significant bit in the BigInteger
+        /// Returns the position of the most significant bit of the BigInteger's absolute value.
         /// </summary>
         /// <example>
         /// 1) The result is 1, if the value of BigInteger is 0...0000 0000
@@ -75,7 +75,7 @@ namespace Aprismatic
         /// <returns></returns>
         public static int BitCount(this BigInteger T)
         {
-            var data = T.ToByteArray();
+            var data = T.Sign >= 0 ? T.ToByteArray() : (-T).ToByteArray();
             byte value = data[data.Length - 1];
             byte mask = 0x80;
             var bits = 8;
@@ -102,8 +102,10 @@ namespace Aprismatic
             if (bits <= 0)
                 throw new ArithmeticException("Number of required bits is not valid.");
 
+            bits++; // add one for the sign
+
             var bytes = bits >> 3;
-            var remBits = bits % 8;
+            var remBits = bits % 8; // TODO: this can be made faster
 
             if (remBits != 0)
                 bytes++;
@@ -112,23 +114,24 @@ namespace Aprismatic
 
             rng.GetBytes(data);
 
-            if (remBits != 0)
+            if (remBits == 1) // bytes must be != 0 here due to bits++
             {
-                byte mask;
-
-                if (bits != 1)
-                {
-                    mask = (byte) (0x01 << (remBits - 1));
-                    data[bytes - 1] |= mask;
-                }
-
-                mask = (byte) (0xFF >> (8 - remBits));
-                data[bytes - 1] &= mask;
+                data[bytes - 1] = 0; // added byte set 0 for positive sign
+                data[bytes - 2] |= 0x80; // MSB set to 1
             }
-            else
-                data[bytes - 1] |= 0x80;
+            else if (remBits > 1)
+            {
+                var mask = (byte)(0x01 << (remBits - 2));
+                data[bytes - 1] |= mask;
 
-            data[bytes - 1] &= 0x7F;
+                mask = (byte)(0xFF >> (8 - remBits + 1));
+                data[bytes - 1] &= mask; // set the sign bit to 0
+            }
+            else // remBits == 0
+            {
+                data[bytes - 1] |= 0x40; // MSB to 1
+                data[bytes - 1] &= 0x7F; // Sign to 0
+            }
 
             return new BigInteger(data);
         }
@@ -152,7 +155,7 @@ namespace Aprismatic
             while (!done)
             {
                 result = result.GenRandomBits(bits, rand);
-                result |= 1;  // make it odd
+                result |= BigInteger.One; // make it odd
 
                 // prime test
                 done = result.IsProbablePrime(confidence);
@@ -177,7 +180,7 @@ namespace Aprismatic
 
             if (thisVal <= UInt64.MaxValue)
             {
-                var uival = (UInt64) thisVal;
+                var uival = (UInt64)thisVal;
 
 
                 for (var i = 0; i < PrimesBelow2000.Length; i++) // test for divisibility by primes < 2000
@@ -243,10 +246,10 @@ namespace Aprismatic
                 do
                 {
                     b = BigInteger.Zero.GenRandomBits(wlen, rng);
-                } while (b >= w - 1 || b < 2);
+                } while (b >= w - BigInteger.One || b < 2);
 
                 var z = BigInteger.ModPow(b, m, w);
-                if (z.IsOne || z == w - 1)
+                if (z.IsOne || z == w - BigInteger.One)
                     continue;
 
                 for (var j = 1; j < a; j++)
@@ -254,11 +257,11 @@ namespace Aprismatic
                     z = BigInteger.ModPow(z, 2, w);
                     if (z.IsOne)
                         return false;
-                    if (z == w - 1)
+                    if (z == w - BigInteger.One)
                         break;
                 }
 
-                if (z != w - 1)
+                if (z != w - BigInteger.One)
                     return false;
             }
 
