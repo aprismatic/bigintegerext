@@ -134,48 +134,72 @@ namespace BigIntegerExtTests
             var rng = RandomNumberGenerator.Create();
             var rand = new Random();
 
-            for (var i = 0; i < 9999; i++) // Test < 32 bits
+            // Test with `bits`
             {
-                var bi = new BigInteger();
+                var bi = BigInteger.Zero;
 
-                bi = bi.GenRandomBits(rand.Next(1, 33), rng);
+                for (var i = 0; i < 9999; i++) // Test < 32 bits
+                {
+                    bi = bi.GenRandomBits(rand.Next(1, 33), rng);
+                    Assert.True(bi < BigInteger.Pow(2, 32));
+                }
 
-                var bytes = bi.ToByteArray();
-                var new_bytes = new byte[5];
-                Array.Copy(bytes, new_bytes, bytes.Length);
+                for (var i = 0; i < 9999; i++) // Test on random number of bits
+                {
+                    var bits = rand.Next(1, 70 * 32 + 1);
+                    bi = bi.GenRandomBits(bits, rng);
+                    Assert.True(bits == bi.BitCount());
+                    Assert.True(bi >= 0);
+                }
 
-                Assert.True(BitConverter.ToUInt32(new_bytes, 0) < Math.Pow(2, 32));
+                for (var i = 0; i < 9999; i++) // Test lower boundary value
+                {
+                    bi = bi.GenRandomBits(1, rng);
+                    Assert.True(bi.ToByteArray()[0] == 1 || bi.ToByteArray()[0] == 0);
+                }
+
+                for (var i = 0; i < 9999; i++) // some edge cases
+                {
+                    var bi255 = bi.GenRandomBits(255, rng);
+                    Assert.Equal(255, bi255.BitCount());
+
+                    var bi256 = bi.GenRandomBits(256, rng);
+                    Assert.Equal(256, bi256.BitCount());
+
+                    var bi257 = bi.GenRandomBits(257, rng);
+                    Assert.Equal(257, bi257.BitCount());
+                }
             }
 
-            for (var i = 0; i < 9999; i++) // Test on random number of bits
-            {
-                var bi = new BigInteger();
-                var bits = rand.Next(1, 70 * 32 + 1);
-                bi = bi.GenRandomBits(bits, rng);
-                Assert.True(bits == bi.BitCount());
-                Assert.True(bi >= 0);
-            }
-
-            for (var i = 0; i < 9999; i++) // Test lower boundary value
+            // Test with upper/lower bounds
             {
                 var bi = new BigInteger();
 
-                bi = bi.GenRandomBits(1, rng);
-                Assert.True(bi.ToByteArray()[0] == 1 || bi.ToByteArray()[0] == 0);
-            }
+                for (var i = 0; i < 999; i++)
+                {
+                    var boundary = new BigInteger(rand.Next());
 
-            for (var i = 0; i < 9999; i++) // some edge cases
-            {
-                var bi = new BigInteger();
+                    bi = bi.GenRandomBits(boundary, boundary, rng);
 
-                var bi256 = bi.GenRandomBits(256, rng);
-                Assert.Equal(256, bi256.BitCount());
+                    Assert.Equal(boundary, bi);
+                }
 
-                var bi257 = bi.GenRandomBits(257, rng);
-                Assert.Equal(257, bi257.BitCount());
+                for (var i = 0; i < 9999; i++)
+                {
+                    var low = rand.Next();
+                    var top = rand.Next();
+                    low *= rand.Next() % 2 == 0 ? 1 : -1;
+                    top *= rand.Next() % 2 == 0 ? 1 : -1;
+                    if (top == low)
+                        low--;
+                    if (low > top)
+                        (low, top) = (top, low);
 
-                var bi255 = bi.GenRandomBits(255, rng);
-                Assert.Equal(255, bi255.BitCount());
+                    bi = bi.GenRandomBits(low, top, rng);
+
+                    Assert.True(bi >= low);
+                    Assert.True(bi < top);
+                }
             }
         }
     }

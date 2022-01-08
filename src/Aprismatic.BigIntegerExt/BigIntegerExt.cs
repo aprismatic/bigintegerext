@@ -8,6 +8,7 @@
  ************************************************************************************/
 
 using System;
+using System.Diagnostics;
 using System.Numerics;
 using System.Security.Cryptography;
 
@@ -93,19 +94,54 @@ namespace Aprismatic
 
 
         /// <summary>
-        /// Returns the specified amount of random bits generated using provided RNG
+        /// Returns a random BigInteger that is within a specified range.
+        /// The lower bound is inclusive, and the upper bound is exclusive.
+        /// Code is based upon this StackOverflow answer: https://stackoverflow.com/a/68593532/664178
         /// </summary>
-        /// <param name="bits"></param>
-        /// <param name="rng"></param>
+        /// <param name="minValue">Inclusive lower bound</param>
+        /// <param name="maxValue">Exclusive upper bound</param>
+        public static BigInteger GenRandomBits(this BigInteger T, BigInteger minValue, BigInteger maxValue, RandomNumberGenerator rng)
+        {
+            if (minValue > maxValue) throw new ArgumentException($"{nameof(minValue)} must be less or equal to {nameof(maxValue)}");
+            if (minValue == maxValue) return minValue;
+            var zeroBasedUpperBound = maxValue - BigInteger.One - minValue; // Inclusive
+            Debug.Assert(zeroBasedUpperBound.Sign >= 0);
+            var bytes = zeroBasedUpperBound.ToByteArray();
+            Debug.Assert(bytes.Length > 0);
+            Debug.Assert((bytes[bytes.Length - 1] & 0b10000000) == 0);
+
+            // Search for the most significant non-zero bit
+            byte lastByteMask = 0b11111111;
+            for (byte mask = 0b10000000; mask > 0; mask >>= 1, lastByteMask >>= 1)
+            {
+                if ((bytes[bytes.Length - 1] & mask) == mask) break; // We found it
+            }
+
+            while (true)
+            {
+                rng.GetBytes(bytes);
+                bytes[bytes.Length - 1] &= lastByteMask;
+                var result = new BigInteger(bytes);
+                Debug.Assert(result.Sign >= 0);
+                if (result <= zeroBasedUpperBound) return result + minValue;
+            }
+        }
+
+
+        /// <summary>
+        /// Returns a random BigInteger of exactly the specified bit length using the provided RNG
+        /// </summary>
+        /// <param name="bits">Bit length of random BigInteger to generate</param>
+        /// <param name="rng">RandomNumberGenerator object</param>
         public static BigInteger GenRandomBits(this BigInteger T, int bits, RandomNumberGenerator rng)
         {
             if (bits <= 0)
-                throw new ArithmeticException("Number of required bits is not valid.");
+                throw new ArgumentException("Number of required bits must be greater than zero.", nameof(bits));
 
-            bits++; // add one for the sign
+            bits++; // add one for the sign bit
 
             var bytes = bits >> 3;
-            var remBits = bits % 8; // TODO: this can be made faster
+            var remBits = bits - (bytes << 3);
 
             if (remBits != 0)
                 bytes++;
@@ -114,9 +150,10 @@ namespace Aprismatic
 
             rng.GetBytes(data);
 
-            if (remBits == 1) // bytes must be != 0 here due to bits++
+            if (remBits == 1)
             {
-                data[bytes - 1] = 0; // added byte set 0 for positive sign
+                // we know that value of `bytes` can't be `0` here because of `bits++`
+                data[bytes - 1] = 0; // added byte set to 0 for positive sign
                 data[bytes - 2] |= 0x80; // MSB set to 1
             }
             else if (remBits > 1)
@@ -138,13 +175,13 @@ namespace Aprismatic
 
 
         /// <summary>
-        /// Generates a positive BigInteger that is probably prime (secured version)
+        /// Generates a random probable prime positive BigInteger of exactly the specified bit length using the provided RNG
         /// </summary>
-        /// <param name="bits">Number of bits; has to be greater than 1</param>
+        /// <param name="bits">Bit length of prime to generate; has to be greater than 1</param>
         /// <param name="confidence">Number of chosen bases</param>
-        /// <param name="rand">RNGCryptoServiceProvider object</param>
+        /// <param name="rng">RandomNumberGenerator object</param>
         /// <returns>A probably prime number</returns>
-        public static BigInteger GenPseudoPrime(this BigInteger T, int bits, int confidence, RandomNumberGenerator rand)
+        public static BigInteger GenPseudoPrime(this BigInteger T, int bits, int confidence, RandomNumberGenerator rng)
         {
             if (bits < 2)
                 throw new ArgumentOutOfRangeException(nameof(bits), bits, "GenPseudoPrime can only generate prime numbers of 2 bits or more");
@@ -154,7 +191,7 @@ namespace Aprismatic
 
             while (!done)
             {
-                result = result.GenRandomBits(bits, rand);
+                result = result.GenRandomBits(bits, rng);
                 result |= BigInteger.One; // make it odd
 
                 // prime test
