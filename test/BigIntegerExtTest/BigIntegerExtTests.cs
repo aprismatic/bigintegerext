@@ -5,7 +5,7 @@ using System.Numerics;
 using System.Security.Cryptography;
 using Xunit;
 
-namespace BigIntegerExtTests
+namespace BigIntegerExtTest
 {
     public class BigIntegerExtTests
     {
@@ -85,12 +85,14 @@ namespace BigIntegerExtTests
         [Fact(DisplayName = "IsProbablePrime")]
         public void TestIsProbablePrime()
         {
-            Assert.False(BigInteger.Zero.IsProbablePrime(10));
-            Assert.False(BigInteger.One.IsProbablePrime(10));
+            var rng = RandomNumberGenerator.Create();
+
+            Assert.False(BigInteger.Zero.IsProbablePrime(10, rng));
+            Assert.False(BigInteger.One.IsProbablePrime(10, rng));
 
             for (var i = 2UL; i < 2000; i++) // since we have an array of primes below 2000 that we can check against
             {
-                var res = (new BigInteger(i)).IsProbablePrime(10);
+                var res = new BigInteger(i).IsProbablePrime(10, rng);
                 Assert.True(BigIntegerExt.PrimesBelow2000.Contains(i) == res,
                     $"{i} is prime is {BigIntegerExt.PrimesBelow2000.Contains(i)} but was evaluated as {res}");
             }
@@ -98,12 +100,12 @@ namespace BigIntegerExtTests
             foreach (var p in new[]
                 { 633910111, 838041647, 15485863, 452930477, 28122569887267, 29996224275833, 571245373823500631 })
             {
-                Assert.True(new BigInteger(p).IsProbablePrime(10));
+                Assert.True(new BigInteger(p).IsProbablePrime(10, rng));
             }
 
             foreach (var p in new[] { 398012025725459, 60030484763, 571245373823500630 })
             {
-                Assert.False(new BigInteger(p).IsProbablePrime(50));
+                Assert.False(new BigInteger(p).IsProbablePrime(50, rng));
             }
         }
 
@@ -114,10 +116,22 @@ namespace BigIntegerExtTests
             var rng = RandomNumberGenerator.Create();
             var rand = new Random();
 
+            // Test throw
+            Assert.Throws<ArgumentOutOfRangeException>(() => BigInteger.Zero.GenSafePseudoPrime(-1, 4, rng));
+            Assert.Throws<ArgumentOutOfRangeException>(() => BigInteger.Zero.GenSafePseudoPrime(0, 4, rng));
+            Assert.Throws<ArgumentOutOfRangeException>(() => BigInteger.Zero.GenSafePseudoPrime(1, 4, rng));
+
+            // Test small numbers thoroughly
+            for (var i = 0; i < 100; i++)
+            {
+                var prime = bi.GenPseudoPrime(rand.Next(2, 9), 4, rng);
+                Assert.Contains(prime, BigIntegerExt.PrimesBelow2000_BI);
+            }
+
             // Test arbitrary values
             for (var i = 0; i < 200; i++)
             {
-                var prime = bi.GenPseudoPrime(rand.Next(2, 768), 2, rng);
+                var prime = bi.GenPseudoPrime(rand.Next(2, 768), 4, rng);
 
                 foreach (var pr in BigIntegerExt.PrimesBelow2000)
                 {
@@ -125,6 +139,45 @@ namespace BigIntegerExtTests
                                 $"prime: {prime}{Environment.NewLine}" +
                                 $"pr:    {pr}");
                 }
+
+                Assert.True(prime.IsProbablePrime(4, rng));
+            }
+        }
+
+        [Fact(DisplayName = "GenSafePseudoPrime")]
+        public void TestGenSafePseudoPrime()
+        {
+            var rng = RandomNumberGenerator.Create();
+            var rand = new Random();
+
+            // Test throw
+            Assert.Throws<ArgumentOutOfRangeException>(() => BigInteger.Zero.GenSafePseudoPrime(-1, 4, rng));
+            Assert.Throws<ArgumentOutOfRangeException>(() => BigInteger.Zero.GenSafePseudoPrime(0, 4, rng));
+            Assert.Throws<ArgumentOutOfRangeException>(() => BigInteger.Zero.GenSafePseudoPrime(1, 4, rng));
+            Assert.Throws<ArgumentOutOfRangeException>(() => BigInteger.Zero.GenSafePseudoPrime(2, 4, rng));
+
+            // Test small numbers thoroughly
+            for (var i = 0; i < 100; i++)
+            {
+                var prime = BigInteger.Zero.GenSafePseudoPrime(rand.Next(3, 9), 4, rng);
+                Assert.Contains(prime, BigIntegerExt.PrimesBelow2000_BI);
+                Assert.Contains(((prime - 1) / 2), BigIntegerExt.PrimesBelow2000_BI);
+            }
+
+            // Test arbitrary values
+            for (var i = 0; i < 20; i++)
+            {
+                var prime = BigInteger.Zero.GenSafePseudoPrime(rand.Next(3, 768), 4, rng);
+
+                foreach (var pr in BigIntegerExt.PrimesBelow2000)
+                {
+                    Assert.True(prime == pr || prime % pr != 0,
+                        $"prime: {prime}{Environment.NewLine}" +
+                        $"pr:    {pr}");
+                }
+
+                Assert.True(prime.IsProbablePrime(4, rng));
+                Assert.True(((prime - 1) / 2).IsProbablePrime(4, rng));
             }
         }
 

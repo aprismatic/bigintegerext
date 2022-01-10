@@ -9,6 +9,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Numerics;
 using System.Security.Cryptography;
 
@@ -34,6 +35,8 @@ namespace Aprismatic
         1663, 1667, 1669, 1693, 1697, 1699, 1709, 1721, 1723, 1733, 1741, 1747, 1753, 1759, 1777, 1783, 1787, 1789, 1801, 1811,
         1823, 1831, 1847, 1861, 1867, 1871, 1873, 1877, 1879, 1889, 1901, 1907, 1913, 1931, 1933, 1949, 1951, 1973, 1979, 1987,
         1993, 1997, 1999 };
+
+        public static readonly BigInteger[] PrimesBelow2000_BI = PrimesBelow2000.Select(p => (BigInteger)p).ToArray();
 
 
         /// <summary>
@@ -181,22 +184,106 @@ namespace Aprismatic
         /// <param name="confidence">Number of chosen bases</param>
         /// <param name="rng">RandomNumberGenerator object</param>
         /// <returns>A probably prime number</returns>
+        /// <exception cref="ArgumentOutOfRangeException"></exception>
         public static BigInteger GenPseudoPrime(this BigInteger T, int bits, int confidence, RandomNumberGenerator rng)
         {
-            if (bits < 2)
-                throw new ArgumentOutOfRangeException(nameof(bits), bits, "GenPseudoPrime can only generate prime numbers of 2 bits or more");
+            if (bits < 2) throw new ArgumentOutOfRangeException(nameof(bits), bits, "GenPseudoPrime can only generate prime numbers of 2 bits or more");
 
-            var result = new BigInteger();
+            BigInteger result;
             var done = false;
 
             while (!done)
             {
-                result = result.GenRandomBits(bits, rng);
+                result = BigInteger.Zero.GenRandomBits(bits, rng);
                 result |= BigInteger.One; // make it odd
 
                 // prime test
-                done = result.IsProbablePrime(confidence);
+                done = result.IsProbablePrime(confidence, rng);
             }
+
+            return result;
+        }
+
+
+        /// <summary>
+        /// Generates a random probable safe prime positive BigInteger of exactly the specified bit length using the provided RNG.
+        /// Safe prime is a prime P such that P=2*Q+1, where Q is prime. Such Q is called a Sophie Germain prime.
+        /// This method uses the Combined Sieve approach to improve performance as compared to naive algorithm.
+        /// See Michael Wiener ``Safe Prime Generation with a Combined Sieve'', 2003 (https://eprint.iacr.org/2003/186)
+        /// </summary>
+        /// <param name="bits">Bit length of prime to generate; has to be greater than 1</param>
+        /// <param name="confidence">Number of chosen bases</param>
+        /// <param name="rng">RandomNumberGenerator object</param>
+        /// <returns>A probably prime number</returns>
+        /// <exception cref="ArgumentOutOfRangeException"></exception>
+        public static BigInteger GenSafePseudoPrime(this BigInteger T, int bits, int confidence, RandomNumberGenerator rng)
+        {
+            if (bits < 3) throw new ArgumentOutOfRangeException(nameof(bits), bits, "GenSafePseudoPrime can only generate prime numbers of 3 bits or more");
+
+            BigInteger result;
+            var two = new BigInteger(2);
+
+            do
+            {
+                BigInteger q;
+                var qbits = bits - 1;
+
+                var done = false;
+
+                while (!done)
+                {
+                    q = BigInteger.Zero.GenRandomBits(qbits, rng);
+                    q |= BigInteger.One; // make it odd
+
+                    var fail = false;
+
+                    if (q <= UInt64.MaxValue)
+                    {
+                        var uival = (UInt64)q;
+
+                        foreach (var curSmallPrime in PrimesBelow2000)
+                        {
+                            if (curSmallPrime >= uival)
+                            {
+                                fail = true; // not a fail but we skip Rabin-Miller test using this flag
+                                done = true; // and exit the outer while loop
+                                break;
+                            }
+
+                            var rem = uival % curSmallPrime;
+
+                            // Sieve: if rem=0 then Q is composite;
+                            //        if second condition is true, then P will be divisible by curSmallPrime
+                            if (rem == 0 || rem == (curSmallPrime - 1) / 2)
+                            {
+                                fail = true;
+                                break;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        foreach (var curSmallPrime in PrimesBelow2000_BI)
+                        {
+                            var rem = q % curSmallPrime;
+
+                            // Sieve: if rem=0 then Q is composite;
+                            //        if second condition is true, then P will be divisible by curSmallPrime
+                            if (rem.IsZero || rem == (curSmallPrime - BigInteger.One) / 2)
+                            {
+                                fail = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (fail) continue; // try another Q
+
+                    done = q.RabinMillerTest(confidence, rng); // returns true if Q is prime
+                }
+
+                result = two * q + BigInteger.One;
+            } while (!result.RabinMillerTest(confidence, rng)); // no need to check divisibility by small primes, can go straight to Rabin-Miller
 
             return result;
         }
@@ -209,8 +296,9 @@ namespace Aprismatic
         /// Before applying the test, the number is tested for divisibility by primes &lt; 2000
         /// </remarks>
         /// <param name="confidence">Number of chosen bases</param>
+        /// <param name="rng">RandomNumberGenerator object</param>
         /// <returns>True if this is probably prime</returns>
-        public static bool IsProbablePrime(this BigInteger T, int confidence)
+        public static bool IsProbablePrime(this BigInteger T, int confidence, RandomNumberGenerator rng)
         {
             var thisVal = BigInteger.Abs(T);
             if (thisVal.IsZero || thisVal.IsOne) return false;
@@ -219,28 +307,25 @@ namespace Aprismatic
             {
                 var uival = (UInt64)thisVal;
 
-
-                for (var i = 0; i < PrimesBelow2000.Length; i++) // test for divisibility by primes < 2000
+                foreach (var smallPrime in PrimesBelow2000)
                 {
-                    var divisor = PrimesBelow2000[i];
-
-                    if (divisor >= uival)
+                    if (smallPrime >= uival)
                         return true;
 
-                    if (uival % divisor == 0)
+                    if (uival % smallPrime == 0)
                         return false;
                 }
             }
             else
             {
-                for (var i = 0; i < PrimesBelow2000.Length; i++) // test for divisibility by primes < 2000
+                foreach (var smallPrime in PrimesBelow2000_BI)
                 {
-                    if ((thisVal % PrimesBelow2000[i]).IsZero)
+                    if ((thisVal % smallPrime).IsZero)
                         return false;
                 }
             }
 
-            return thisVal.RabinMillerTest(confidence);
+            return thisVal.RabinMillerTest(confidence, rng);
         }
 
 
@@ -260,7 +345,7 @@ namespace Aprismatic
         /// </remarks>
         /// <param name="confidence">Number of chosen bases</param>
         /// <returns>True if this is a strong pseudoprime to randomly chosen bases</returns>
-        public static bool RabinMillerTest(this BigInteger w, int confidence)
+        public static bool RabinMillerTest(this BigInteger w, int confidence, RandomNumberGenerator rng)
         {
             var m = w - BigInteger.One;
             var a = 0;
@@ -271,10 +356,6 @@ namespace Aprismatic
                 a++;
             }
 
-            // There is no built-in method for generating random BigInteger values.
-            // Instead, random BigIntegers are constructed from randomly generated
-            // byte arrays of the same length as the w.
-            var rng = RandomNumberGenerator.Create();
             var wlen = w.BitCount();
             BigInteger b;
 
