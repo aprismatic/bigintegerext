@@ -189,7 +189,7 @@ namespace Aprismatic
         {
             if (bits < 2) throw new ArgumentOutOfRangeException(nameof(bits), bits, "GenPseudoPrime can only generate prime numbers of 2 bits or more");
 
-            BigInteger result;
+            BigInteger result = new BigInteger();
             var done = false;
 
             while (!done)
@@ -225,7 +225,7 @@ namespace Aprismatic
 
             do
             {
-                BigInteger q;
+                BigInteger q = new BigInteger();
                 var qbits = bits - 1;
 
                 var done = false;
