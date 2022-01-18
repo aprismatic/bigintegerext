@@ -40,10 +40,10 @@ namespace Aprismatic
 
 
         /// <summary>
-        /// Calculates the modulo inverse of this.
+        /// Calculates the modulo inverse of `this`.
         /// </summary>
         /// <param name="mod">Modulo</param>
-        /// <returns>Modulo inverse of this; or 1 if mod.inv. does not exist.</returns>
+        /// <returns>Modulo inverse of `this`; or 1 if mod.inv. does not exist.</returns>
         public static BigInteger ModInverse(this BigInteger T, BigInteger mod)
         {
             BigInteger i = mod, v = BigInteger.Zero, d = BigInteger.One, t, x;
@@ -76,11 +76,10 @@ namespace Aprismatic
         /// 4) The result is 2, if the value of BigInteger is 0...0000 0011
         /// 5) The result is 5, if the value of BigInteger is 0...0001 0011
         /// </example>
-        /// <returns></returns>
         public static int BitCount(this BigInteger T)
         {
             var data = T.Sign >= 0 ? T.ToByteArray() : (-T).ToByteArray();
-            byte value = data[data.Length - 1];
+            var value = data[data.Length - 1];
             byte mask = 0x80;
             var bits = 8;
 
@@ -103,6 +102,7 @@ namespace Aprismatic
         /// </summary>
         /// <param name="minValue">Inclusive lower bound</param>
         /// <param name="maxValue">Exclusive upper bound</param>
+        /// <param name="rng">Random number generator to use</param>
         public static BigInteger GenRandomBits(this BigInteger T, BigInteger minValue, BigInteger maxValue, RandomNumberGenerator rng)
         {
             if (minValue > maxValue) throw new ArgumentException($"{nameof(minValue)} must be less or equal to {nameof(maxValue)}");
@@ -136,10 +136,10 @@ namespace Aprismatic
         /// </summary>
         /// <param name="bits">Bit length of random BigInteger to generate</param>
         /// <param name="rng">RandomNumberGenerator object</param>
+        /// <exception cref="ArgumentOutOfRangeException">`bits` must be > 0</exception>
         public static BigInteger GenRandomBits(this BigInteger T, int bits, RandomNumberGenerator rng)
         {
-            if (bits <= 0)
-                throw new ArgumentException("Number of required bits must be greater than zero.", nameof(bits));
+            if (bits <= 0) throw new ArgumentOutOfRangeException(nameof(bits), bits, "Number of required bits must be greater than zero.");
 
             bits++; // add one for the sign bit
 
@@ -150,7 +150,6 @@ namespace Aprismatic
                 bytes++;
 
             var data = new byte[bytes];
-
             rng.GetBytes(data);
 
             if (remBits == 1)
@@ -184,22 +183,18 @@ namespace Aprismatic
         /// <param name="confidence">Number of chosen bases</param>
         /// <param name="rng">RandomNumberGenerator object</param>
         /// <returns>A probably prime number</returns>
-        /// <exception cref="ArgumentOutOfRangeException"></exception>
+        /// <exception cref="ArgumentOutOfRangeException">`bits` must be >= 2</exception>
         public static BigInteger GenPseudoPrime(this BigInteger T, int bits, int confidence, RandomNumberGenerator rng)
         {
             if (bits < 2) throw new ArgumentOutOfRangeException(nameof(bits), bits, "GenPseudoPrime can only generate prime numbers of 2 bits or more");
 
             BigInteger result;
-            var done = false;
 
-            while (!done)
+            do
             {
                 result = BigInteger.Zero.GenRandomBits(bits, rng);
                 result |= BigInteger.One; // make it odd
-
-                // prime test
-                done = result.IsProbablePrime(confidence, rng);
-            }
+            } while (!result.IsProbablePrime(confidence, rng));
 
             return result;
         }
@@ -211,11 +206,11 @@ namespace Aprismatic
         /// This method uses the Combined Sieve approach to improve performance as compared to naive algorithm.
         /// See Michael Wiener ``Safe Prime Generation with a Combined Sieve'', 2003 (https://eprint.iacr.org/2003/186)
         /// </summary>
-        /// <param name="bits">Bit length of prime to generate; has to be greater than 1</param>
+        /// <param name="bits">Bit length of prime to generate</param>
         /// <param name="confidence">Number of chosen bases</param>
         /// <param name="rng">RandomNumberGenerator object</param>
         /// <returns>A probably prime number</returns>
-        /// <exception cref="ArgumentOutOfRangeException"></exception>
+        /// <exception cref="ArgumentOutOfRangeException">`bits` must be >= 3</exception>
         public static BigInteger GenSafePseudoPrime(this BigInteger T, int bits, int confidence, RandomNumberGenerator rng)
         {
             if (bits < 3) throw new ArgumentOutOfRangeException(nameof(bits), bits, "GenSafePseudoPrime can only generate prime numbers of 3 bits or more");
@@ -347,7 +342,8 @@ namespace Aprismatic
         /// <returns>True if this is a strong pseudoprime to randomly chosen bases</returns>
         public static bool RabinMillerTest(this BigInteger w, int confidence, RandomNumberGenerator rng)
         {
-            var m = w - BigInteger.One;
+            var wMinusOne = w - BigInteger.One;
+            var m = wMinusOne;
             var a = 0;
 
             while (m.IsEven)
@@ -364,10 +360,10 @@ namespace Aprismatic
                 do
                 {
                     b = BigInteger.Zero.GenRandomBits(wlen, rng);
-                } while (b >= w - BigInteger.One || b < 2);
+                } while (b >= wMinusOne || b < 2);
 
                 var z = BigInteger.ModPow(b, m, w);
-                if (z.IsOne || z == w - BigInteger.One)
+                if (z.IsOne || z == wMinusOne)
                     continue;
 
                 for (var j = 1; j < a; j++)
@@ -375,11 +371,11 @@ namespace Aprismatic
                     z = BigInteger.ModPow(z, 2, w);
                     if (z.IsOne)
                         return false;
-                    if (z == w - BigInteger.One)
+                    if (z == wMinusOne)
                         break;
                 }
 
-                if (z != w - BigInteger.One)
+                if (z != wMinusOne)
                     return false;
             }
 
