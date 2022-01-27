@@ -26,6 +26,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BigIntegerExtTest", "test\B
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Aprismatic.BigIntegerExt", "src\Aprismatic.BigIntegerExt\Aprismatic.BigIntegerExt.csproj", "{2EA36A4D-10A4-4572-AE68-2D804CAEDC83}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Perf", "test\Perf\Perf.csproj", "{5E5D5CF3-64A6-442A-9817-FE63DA614146}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -40,6 +42,10 @@ Global
 		{2EA36A4D-10A4-4572-AE68-2D804CAEDC83}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2EA36A4D-10A4-4572-AE68-2D804CAEDC83}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2EA36A4D-10A4-4572-AE68-2D804CAEDC83}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5E5D5CF3-64A6-442A-9817-FE63DA614146}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5E5D5CF3-64A6-442A-9817-FE63DA614146}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5E5D5CF3-64A6-442A-9817-FE63DA614146}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5E5D5CF3-64A6-442A-9817-FE63DA614146}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -47,6 +53,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{782332B8-4698-4132-AED5-4EF1694A73E8} = {9993F7DE-AFDC-4D82-A030-C3C5E373CE77}
 		{2EA36A4D-10A4-4572-AE68-2D804CAEDC83} = {3303BAA0-773E-4F5D-B699-F3CA3CD5BBB4}
+		{5E5D5CF3-64A6-442A-9817-FE63DA614146} = {9993F7DE-AFDC-4D82-A030-C3C5E373CE77}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {575666A0-07A3-4BB3-95A8-281FA6583CE7}
