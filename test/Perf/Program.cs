@@ -8,12 +8,12 @@ using BenchmarkDotNet.Running;
 
 namespace MyBenchmark
 {
-    [SimpleJob(runStrategy: RunStrategy.Throughput, invocationCount: 5000)]
+    [SimpleJob(runStrategy: RunStrategy.Throughput, invocationCount: 10000)]
     public class Bench
     {
         private readonly RandomNumberGenerator rng = RandomNumberGenerator.Create();
 
-        [Params(4,8,16)]
+        [Params(4,8,12,16)]
         public int confidence;
 
         [Params(256,512,1024,2048,4096)]
