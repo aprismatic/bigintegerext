@@ -9,7 +9,7 @@ using BenchmarkDotNet.Running;
 
 namespace MyBenchmark
 {
-    [SimpleJob(runStrategy: RunStrategy.Throughput, invocationCount: 750)]
+    [SimpleJob(runStrategy: RunStrategy.Throughput, invocationCount: 1000)]
     public class Bench
     {
         private readonly RandomNumberGenerator rng = RandomNumberGenerator.Create();
@@ -44,7 +44,7 @@ namespace MyBenchmark
             BigIntegerExt.PrimesBelow2000 = BigIntegerExt.PrimesBelow1M.Where(x => x < PrimeListCap * 1000).OrderBy(x => x).ToArray();
             BigIntegerExt.PrimesBelow2000_BI = BigIntegerExt.PrimesBelow2000.Select(p => (BigInteger) p).ToArray();
 
-            if (BigIntegerExt.PrimesBelow2000[^1] >= PrimeListCap) throw new Exception("selection");
+            if (BigIntegerExt.PrimesBelow2000[^1] >= PrimeListCap*1000) throw new Exception("selection");
             if (BigIntegerExt.PrimesBelow2000.Length != BigIntegerExt.PrimesBelow2000_BI.Length) throw new Exception("lengths");
             for (var i = 0; i < BigIntegerExt.PrimesBelow2000.Length; i++)
                 if (BigIntegerExt.PrimesBelow2000[i] != BigIntegerExt.PrimesBelow2000_BI[i]) throw new Exception("values");
