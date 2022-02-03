@@ -4,23 +4,26 @@ using System.Numerics;
 using System.Security.Cryptography;
 using Aprismatic;
 using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Engines;
+using BenchmarkDotNet.Exporters;
+using BenchmarkDotNet.Exporters.Csv;
 using BenchmarkDotNet.Running;
 
 namespace MyBenchmark
 {
-    [SimpleJob(runStrategy: RunStrategy.Throughput, invocationCount: 1000)]
+    [SimpleJob(runStrategy: RunStrategy.Throughput, invocationCount: 1)]
     public class Bench
     {
         private readonly RandomNumberGenerator rng = RandomNumberGenerator.Create();
 
-        [Params(4,10,16)]
+        [Params(4,/*10,*/16)]
         public int confidence;
 
-        [Params(128,256,512,1024,2048,4096,8192)]
+        [Params(128,256,512/*,1024,2048,4096,8192*/)]
         public int bits;
 
-        [Params(1,2,5,10,20,30,40,50,75,100,125,150,200,250,300,350,400,500,600,700,800,900,1000)]
+        [Params(1,2,5,10,20/*,30,40,50,75,100,125,150,200,250,300,350,400,500,600,700,800,900,1000*/)]
         public ulong PrimeListCap;
 
         private BigInteger[] numbers;
@@ -33,8 +36,11 @@ namespace MyBenchmark
             numbers = new BigInteger[amount];
             for (var i = 0; i < amount; i++)
             {
-                numbers[i] = BigInteger.One.GenRandomBits(bits, rng);
-                numbers[i] |= BigInteger.One;
+                do
+                {
+                    numbers[i] = BigInteger.One.GenRandomBits(bits, rng);
+                    numbers[i] |= BigInteger.One;
+                } while (numbers[i] % 3 == 0 || numbers[i] % 5 == 0 || numbers[i] % 7 == 0 || numbers[i] % 11 == 0);
             }
         }
 
@@ -60,7 +66,9 @@ namespace MyBenchmark
     {
         public static void Main(string[] args)
         {
-            BenchmarkRunner.Run<Bench>();
+            BenchmarkRunner.Run<Bench>(
+                DefaultConfig.Instance
+                    .AddExporter(RPlotExporter.Default, CsvExporter.Default));
         }
     }
 }

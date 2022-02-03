@@ -103,7 +103,7 @@ namespace BigIntegerExtTest
                 Assert.True(new BigInteger(p).IsProbablePrime(10, rng));
             }
 
-            foreach (var p in new[] { 398012025725459, 60030484763, 571245373823500630 })
+            foreach (var p in new[] { 398012025725459, 60030484763, 571245373823500630, 239812014798221 })
             {
                 Assert.False(new BigInteger(p).IsProbablePrime(50, rng));
             }

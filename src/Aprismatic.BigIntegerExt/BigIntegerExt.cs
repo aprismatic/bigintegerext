@@ -17,6 +17,8 @@ namespace Aprismatic
 {
     public static partial class BigIntegerExt
     {
+        private static BigInteger Two = new BigInteger(2);
+
         /// <summary>
         /// Calculates the modulo inverse of `this`.
         /// </summary>
@@ -194,7 +196,6 @@ namespace Aprismatic
             if (bits < 3) throw new ArgumentOutOfRangeException(nameof(bits), bits, "GenSafePseudoPrime can only generate prime numbers of 3 bits or more");
 
             BigInteger result;
-            var two = new BigInteger(2);
 
             do
             {
@@ -255,7 +256,7 @@ namespace Aprismatic
                     done = q.RabinMillerTest(confidence, rng); // returns true if Q is prime
                 }
 
-                result = two * q + BigInteger.One;
+                result = Two * q + BigInteger.One;
             } while (!result.RabinMillerTest(confidence, rng)); // no need to check divisibility by small primes, can go straight to Rabin-Miller
 
             return result;
@@ -308,15 +309,15 @@ namespace Aprismatic
         /// This method REQUIRES that the BigInteger is positive
         /// </summary>
         /// <remarks>
-        /// for any p &gt; 0 with p - 1 = 2^s * t
+        /// for any positive, odd p with p–1 = 2^s * t
         ///
-        /// p is probably prime (strong pseudoprime) if for any a &lt; p,
+        /// p is probably prime (strong pseudoprime) if for a random "witness" a &lt; p,
         /// 1) a^t mod p = 1 or
-        /// 2) a^((2^j)*t) mod p = p-1 for some 0 &lt;= j &lt;= s-1
+        /// 2) a^((2^j)*t) mod p = p–1 for some 0 ≤ j ≤ s–1
         ///
         /// Otherwise, p is composite.
         /// </remarks>
-        /// <param name="confidence">Number of chosen bases</param>
+        /// <param name="confidence">Number of rounds of RM algorithm to execute</param>
         /// <returns>True if this is a strong pseudoprime to randomly chosen bases</returns>
         public static bool RabinMillerTest(this BigInteger w, int confidence, RandomNumberGenerator rng)
         {
@@ -335,10 +336,7 @@ namespace Aprismatic
 
             for (var i = 0; i < confidence; i++)
             {
-                do
-                {
-                    b = BigInteger.Zero.GenRandomBits(wlen, rng);
-                } while (b >= wMinusOne || b < 2);
+                b = BigInteger.Zero.GenRandomBits(Two,wMinusOne, rng);
 
                 var z = BigInteger.ModPow(b, m, w);
                 if (z.IsOne || z == wMinusOne)
@@ -346,7 +344,7 @@ namespace Aprismatic
 
                 for (var j = 1; j < a; j++)
                 {
-                    z = BigInteger.ModPow(z, 2, w);
+                    z = BigInteger.ModPow(z, Two, w);
                     if (z.IsOne)
                         return false;
                     if (z == wMinusOne)
