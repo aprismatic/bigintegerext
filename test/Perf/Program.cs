@@ -17,10 +17,10 @@ namespace MyBenchmark
     {
         private readonly RandomNumberGenerator rng = RandomNumberGenerator.Create();
 
-        [Params(4,10,16)]
+        [Params(2)]
         public int confidence;
 
-        [Params(128,256,512,1024,2048,4096,8192)]
+        [Params(128,256,512,1024,2048,4096,8192,16384)]
         public int bits;
 
         [Params(1,2,5,10,20,30,40,50,75,100,125,150,200,250,300,350,400,500,600,700,800,900,1000)]
