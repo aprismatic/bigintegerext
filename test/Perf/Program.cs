@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Immutable;
-using System.Numerics;
+﻿using System.Numerics;
 using System.Security.Cryptography;
 using Aprismatic;
 using BenchmarkDotNet.Attributes;
@@ -68,7 +66,8 @@ namespace MyBenchmark
         {
             BenchmarkRunner.Run<Bench>(
                 DefaultConfig.Instance
-                    .AddExporter(RPlotExporter.Default, CsvExporter.Default));
+                    .AddExporter(RPlotExporter.Default)
+                    .AddExporter(CsvMeasurementsExporter.Default));
         }
     }
 }
