@@ -78,7 +78,8 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         args: 'nupkgs/*'
-    - name: Release artifacts to NuGet
+    - name: Setup nuget
       uses: nuget/setup-nuget@v1
+    - name: Release artifacts to NuGet
       run : |
         nuget push nupkgs/*.nupkg -k ${{ secrets.NUGET_SECRET_BIGINTEGEREXT }} -s https://api.nuget.org/v3/index.json         
