@@ -93,8 +93,8 @@ namespace BigIntegerExtTest
             for (var i = 2UL; i < 2000; i++) // since we have an array of primes below 2000 that we can check against
             {
                 var res = new BigInteger(i).IsProbablePrime(10, rng);
-                Assert.True(BigIntegerExt.PrimesBelow2000.Contains(i) == res,
-                    $"{i} is prime is {BigIntegerExt.PrimesBelow2000.Contains(i)} but was evaluated as {res}");
+                Assert.True(BigIntegerExt.PrimesBelow1M.Contains(i) == res,
+                    $"{i} is prime is {BigIntegerExt.PrimesBelow1M.Contains(i)} but was evaluated as {res}");
             }
 
             foreach (var p in new[]
@@ -125,7 +125,7 @@ namespace BigIntegerExtTest
             for (var i = 0; i < 100; i++)
             {
                 var prime = bi.GenPseudoPrime(rand.Next(2, 9), 4, rng);
-                Assert.Contains(prime, BigIntegerExt.PrimesBelow2000_BI);
+                Assert.Contains(prime, BigIntegerExt.PrimesBelow1M_BI);
             }
 
             // Test arbitrary values
@@ -133,7 +133,7 @@ namespace BigIntegerExtTest
             {
                 var prime = bi.GenPseudoPrime(rand.Next(2, 768), 4, rng);
 
-                foreach (var pr in BigIntegerExt.PrimesBelow2000)
+                foreach (var pr in BigIntegerExt.PrimesBelow1M)
                 {
                     Assert.True(prime == pr || prime % pr != 0,
                                 $"prime: {prime}{Environment.NewLine}" +
@@ -160,8 +160,8 @@ namespace BigIntegerExtTest
             for (var i = 0; i < 100; i++)
             {
                 var prime = BigInteger.Zero.GenSafePseudoPrime(rand.Next(3, 9), 4, rng);
-                Assert.Contains(prime, BigIntegerExt.PrimesBelow2000_BI);
-                Assert.Contains(((prime - 1) / 2), BigIntegerExt.PrimesBelow2000_BI);
+                Assert.Contains(prime, BigIntegerExt.PrimesBelow1M_BI);
+                Assert.Contains(((prime - 1) / 2), BigIntegerExt.PrimesBelow1M_BI);
             }
 
             // Test arbitrary values
@@ -169,7 +169,7 @@ namespace BigIntegerExtTest
             {
                 var prime = BigInteger.Zero.GenSafePseudoPrime(rand.Next(3, 768), 4, rng);
 
-                foreach (var pr in BigIntegerExt.PrimesBelow2000)
+                foreach (var pr in BigIntegerExt.PrimesBelow1M)
                 {
                     Assert.True(prime == pr || prime % pr != 0,
                         $"prime: {prime}{Environment.NewLine}" +

@@ -72,9 +72,13 @@ jobs:
       with:
         name: nupkgs
         path: nupkgs
-    - name: Release artifacts
+    - name: Release artifacts to github
       uses: skx/github-action-publish-binaries@master
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         args: 'nupkgs/*'
+    - name: Release artifacts to NuGet
+      uses: nuget/setup-nuget@v1
+      run : |
+        nuget push nupkgs/*.nupkg -k ${{ secrets.NUGET_SECRET_BIGINTEGEREXT }} -s https://api.nuget.org/v3/index.json         

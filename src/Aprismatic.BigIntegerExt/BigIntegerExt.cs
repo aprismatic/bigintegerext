@@ -197,10 +197,12 @@ namespace Aprismatic
 
             BigInteger result;
 
+            var qbits = bits - 1;
+            var take = PrimeFactorsToUse(bits);
+
             do
             {
                 BigInteger q;
-                var qbits = bits - 1;
 
                 var done = false;
 
@@ -215,7 +217,7 @@ namespace Aprismatic
                     {
                         var uival = (UInt64)q;
 
-                        foreach (var curSmallPrime in PrimesBelow2000)
+                        foreach (var curSmallPrime in PrimesBelow1M.Take(take))
                         {
                             if (curSmallPrime >= uival)
                             {
@@ -237,13 +239,13 @@ namespace Aprismatic
                     }
                     else
                     {
-                        foreach (var curSmallPrime in PrimesBelow2000_BI)
+                        foreach (var curSmallPrime in PrimesBelow1M_BI.Take(take))
                         {
                             var rem = q % curSmallPrime;
 
                             // Sieve: if rem=0 then Q is composite;
                             //        if second condition is true, then P will be divisible by curSmallPrime
-                            if (rem.IsZero || rem == (curSmallPrime - BigInteger.One) / 2)
+                            if (rem.IsZero || rem == (curSmallPrime - BigInteger.One) / Two)
                             {
                                 fail = true;
                                 break;
@@ -267,21 +269,27 @@ namespace Aprismatic
         /// Determines whether a number is probably prime using the Rabin-Miller's test
         /// </summary>
         /// <remarks>
-        /// Before applying the test, the number is tested for divisibility by primes &lt; 2000
+        /// Before applying the test, the number is tested for divisibility by X first primes.
+        /// X was determined for different number of bits and is used as a constant.
         /// </remarks>
         /// <param name="confidence">Number of chosen bases</param>
         /// <param name="rng">RandomNumberGenerator object</param>
+        /// <param name="bitLength"></param>
         /// <returns>True if this is probably prime</returns>
-        public static bool IsProbablePrime(this BigInteger T, int confidence, RandomNumberGenerator rng)
+        public static bool IsProbablePrime(this BigInteger T, int confidence, RandomNumberGenerator rng, int bitLength = -1)
         {
             var thisVal = BigInteger.Abs(T);
             if (thisVal.IsZero || thisVal.IsOne) return false;
+
+            if(bitLength == -1)
+                bitLength = thisVal.BitCount();
+            var take = PrimeFactorsToUse(bitLength);
 
             if (thisVal <= UInt64.MaxValue)
             {
                 var uival = (UInt64)thisVal;
 
-                foreach (var smallPrime in PrimesBelow2000)
+                foreach (var smallPrime in PrimesBelow1M.Take(take))
                 {
                     if (smallPrime >= uival)
                         return true;
@@ -292,7 +300,7 @@ namespace Aprismatic
             }
             else
             {
-                foreach (var smallPrime in PrimesBelow2000_BI)
+                foreach (var smallPrime in PrimesBelow1M_BI.Take(take))
                 {
                     if ((thisVal % smallPrime).IsZero)
                         return false;
@@ -300,6 +308,29 @@ namespace Aprismatic
             }
 
             return thisVal.RabinMillerTest(confidence, rng);
+        }
+
+
+        /// <summary>
+        /// Based on our extensive perf testing, we came up with ~ optimal amount of
+        /// prime factors to try before using Rabin-Miller test for various bit lengths.
+        ///  bit length | test primes less than
+        ///  -----------+----------------------
+        ///     ≤ 192   |      1000
+        ///     ≤ 384   |      2000
+        ///     ≤ 1536  |      10000
+        ///     ≤ 3072  |      50000
+        ///     ≤ 6144  |      100000
+        ///      else   |      150000
+        /// </summary>
+        private static int PrimeFactorsToUse(int bitLength)
+        {
+            if (bitLength <= 192) return 168; // 168 primes under 1000
+            if (bitLength <= 384) return 303; // 303 primes under 2000
+            if (bitLength <= 1536) return 1229; // 1229 primes under 10000
+            if (bitLength <= 3072) return 5133; // 5133 primes under 50000
+            if (bitLength <= 6144) return 9592; // 9592 primes under 100000
+            return 13848; // 13848 primes under 150000
         }
 
 
