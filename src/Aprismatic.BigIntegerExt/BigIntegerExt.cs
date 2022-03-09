@@ -367,7 +367,7 @@ namespace Aprismatic
 
             for (var i = 0; i < confidence; i++)
             {
-                b = BigInteger.Zero.GenRandomBits(Two,wMinusOne, rng);
+                b = BigInteger.Zero.GenRandomBits(Two, wMinusOne, rng);
 
                 var z = BigInteger.ModPow(b, m, w);
                 if (z.IsOne || z == wMinusOne)
