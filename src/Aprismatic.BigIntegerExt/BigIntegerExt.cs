@@ -15,29 +15,9 @@ using System.Security.Cryptography;
 
 namespace Aprismatic
 {
-    public static class BigIntegerExt
+    public static partial class BigIntegerExt
     {
-        // primes smaller than 2000 to test the generated prime number
-        public static readonly ulong[] PrimesBelow2000 = {
-           2,    3,    5,    7,   11,   13,   17,   19,   23,   29,   31,   37,   41,   43,   47,   53,   59,   61,   67,   71,
-          73,   79,   83,   89,   97,  101,  103,  107,  109,  113,  127,  131,  137,  139,  149,  151,  157,  163,  167,  173,
-         179,  181,  191,  193,  197,  199,  211,  223,  227,  229,  233,  239,  241,  251,  257,  263,  269,  271,  277,  281,
-         283,  293,  307,  311,  313,  317,  331,  337,  347,  349,  353,  359,  367,  373,  379,  383,  389,  397,  401,  409,
-         419,  421,  431,  433,  439,  443,  449,  457,  461,  463,  467,  479,  487,  491,  499,  503,  509,  521,  523,  541,
-         547,  557,  563,  569,  571,  577,  587,  593,  599,  601,  607,  613,  617,  619,  631,  641,  643,  647,  653,  659,
-         661,  673,  677,  683,  691,  701,  709,  719,  727,  733,  739,  743,  751,  757,  761,  769,  773,  787,  797,  809,
-         811,  821,  823,  827,  829,  839,  853,  857,  859,  863,  877,  881,  883,  887,  907,  911,  919,  929,  937,  941,
-         947,  953,  967,  971,  977,  983,  991,  997, 1009, 1013, 1019, 1021, 1031, 1033, 1039, 1049, 1051, 1061, 1063, 1069,
-        1087, 1091, 1093, 1097, 1103, 1109, 1117, 1123, 1129, 1151, 1153, 1163, 1171, 1181, 1187, 1193, 1201, 1213, 1217, 1223,
-        1229, 1231, 1237, 1249, 1259, 1277, 1279, 1283, 1289, 1291, 1297, 1301, 1303, 1307, 1319, 1321, 1327, 1361, 1367, 1373,
-        1381, 1399, 1409, 1423, 1427, 1429, 1433, 1439, 1447, 1451, 1453, 1459, 1471, 1481, 1483, 1487, 1489, 1493, 1499, 1511,
-        1523, 1531, 1543, 1549, 1553, 1559, 1567, 1571, 1579, 1583, 1597, 1601, 1607, 1609, 1613, 1619, 1621, 1627, 1637, 1657,
-        1663, 1667, 1669, 1693, 1697, 1699, 1709, 1721, 1723, 1733, 1741, 1747, 1753, 1759, 1777, 1783, 1787, 1789, 1801, 1811,
-        1823, 1831, 1847, 1861, 1867, 1871, 1873, 1877, 1879, 1889, 1901, 1907, 1913, 1931, 1933, 1949, 1951, 1973, 1979, 1987,
-        1993, 1997, 1999 };
-
-        public static readonly BigInteger[] PrimesBelow2000_BI = PrimesBelow2000.Select(p => (BigInteger)p).ToArray();
-
+        private static BigInteger Two = new BigInteger(2);
 
         /// <summary>
         /// Calculates the modulo inverse of `this`.
@@ -216,12 +196,13 @@ namespace Aprismatic
             if (bits < 3) throw new ArgumentOutOfRangeException(nameof(bits), bits, "GenSafePseudoPrime can only generate prime numbers of 3 bits or more");
 
             BigInteger result;
-            var two = new BigInteger(2);
+
+            var qbits = bits - 1;
+            var take = PrimeFactorsToUse(bits);
 
             do
             {
                 BigInteger q;
-                var qbits = bits - 1;
 
                 var done = false;
 
@@ -236,7 +217,7 @@ namespace Aprismatic
                     {
                         var uival = (UInt64)q;
 
-                        foreach (var curSmallPrime in PrimesBelow2000)
+                        foreach (var curSmallPrime in PrimesBelow1M.Take(take))
                         {
                             if (curSmallPrime >= uival)
                             {
@@ -258,13 +239,13 @@ namespace Aprismatic
                     }
                     else
                     {
-                        foreach (var curSmallPrime in PrimesBelow2000_BI)
+                        foreach (var curSmallPrime in PrimesBelow1M_BI.Take(take))
                         {
                             var rem = q % curSmallPrime;
 
                             // Sieve: if rem=0 then Q is composite;
                             //        if second condition is true, then P will be divisible by curSmallPrime
-                            if (rem.IsZero || rem == (curSmallPrime - BigInteger.One) / 2)
+                            if (rem.IsZero || rem == (curSmallPrime - BigInteger.One) / Two)
                             {
                                 fail = true;
                                 break;
@@ -277,7 +258,7 @@ namespace Aprismatic
                     done = q.RabinMillerTest(confidence, rng); // returns true if Q is prime
                 }
 
-                result = two * q + BigInteger.One;
+                result = Two * q + BigInteger.One;
             } while (!result.RabinMillerTest(confidence, rng)); // no need to check divisibility by small primes, can go straight to Rabin-Miller
 
             return result;
@@ -288,21 +269,27 @@ namespace Aprismatic
         /// Determines whether a number is probably prime using the Rabin-Miller's test
         /// </summary>
         /// <remarks>
-        /// Before applying the test, the number is tested for divisibility by primes &lt; 2000
+        /// Before applying the test, the number is tested for divisibility by X first primes.
+        /// X was determined for different number of bits and is used as a constant.
         /// </remarks>
         /// <param name="confidence">Number of chosen bases</param>
         /// <param name="rng">RandomNumberGenerator object</param>
+        /// <param name="bitLength"></param>
         /// <returns>True if this is probably prime</returns>
-        public static bool IsProbablePrime(this BigInteger T, int confidence, RandomNumberGenerator rng)
+        public static bool IsProbablePrime(this BigInteger T, int confidence, RandomNumberGenerator rng, int bitLength = -1)
         {
             var thisVal = BigInteger.Abs(T);
             if (thisVal.IsZero || thisVal.IsOne) return false;
+
+            if(bitLength == -1)
+                bitLength = thisVal.BitCount();
+            var take = PrimeFactorsToUse(bitLength);
 
             if (thisVal <= UInt64.MaxValue)
             {
                 var uival = (UInt64)thisVal;
 
-                foreach (var smallPrime in PrimesBelow2000)
+                foreach (var smallPrime in PrimesBelow1M.Take(take))
                 {
                     if (smallPrime >= uival)
                         return true;
@@ -313,7 +300,7 @@ namespace Aprismatic
             }
             else
             {
-                foreach (var smallPrime in PrimesBelow2000_BI)
+                foreach (var smallPrime in PrimesBelow1M_BI.Take(take))
                 {
                     if ((thisVal % smallPrime).IsZero)
                         return false;
@@ -325,20 +312,43 @@ namespace Aprismatic
 
 
         /// <summary>
+        /// Based on our extensive perf testing, we came up with ~ optimal amount of
+        /// prime factors to try before using Rabin-Miller test for various bit lengths.
+        ///  bit length | test primes less than
+        ///  -----------+----------------------
+        ///     ≤ 192   |      1000
+        ///     ≤ 384   |      2000
+        ///     ≤ 1536  |      10000
+        ///     ≤ 3072  |      50000
+        ///     ≤ 6144  |      100000
+        ///      else   |      150000
+        /// </summary>
+        private static int PrimeFactorsToUse(int bitLength)
+        {
+            if (bitLength <= 192) return 168; // 168 primes under 1000
+            if (bitLength <= 384) return 303; // 303 primes under 2000
+            if (bitLength <= 1536) return 1229; // 1229 primes under 10000
+            if (bitLength <= 3072) return 5133; // 5133 primes under 50000
+            if (bitLength <= 6144) return 9592; // 9592 primes under 100000
+            return 13848; // 13848 primes under 150000
+        }
+
+
+        /// <summary>
         /// Probabilistic prime test based on Miller-Rabin's algorithm.
         /// Algorithm based on http://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.186-4.pdf (p. 72)
         /// This method REQUIRES that the BigInteger is positive
         /// </summary>
         /// <remarks>
-        /// for any p &gt; 0 with p - 1 = 2^s * t
+        /// for any positive, odd p with p–1 = 2^s * t
         ///
-        /// p is probably prime (strong pseudoprime) if for any a &lt; p,
+        /// p is probably prime (strong pseudoprime) if for a random "witness" a &lt; p,
         /// 1) a^t mod p = 1 or
-        /// 2) a^((2^j)*t) mod p = p-1 for some 0 &lt;= j &lt;= s-1
+        /// 2) a^((2^j)*t) mod p = p–1 for some 0 ≤ j ≤ s–1
         ///
         /// Otherwise, p is composite.
         /// </remarks>
-        /// <param name="confidence">Number of chosen bases</param>
+        /// <param name="confidence">Number of rounds of RM algorithm to execute</param>
         /// <returns>True if this is a strong pseudoprime to randomly chosen bases</returns>
         public static bool RabinMillerTest(this BigInteger w, int confidence, RandomNumberGenerator rng)
         {
@@ -357,10 +367,7 @@ namespace Aprismatic
 
             for (var i = 0; i < confidence; i++)
             {
-                do
-                {
-                    b = BigInteger.Zero.GenRandomBits(wlen, rng);
-                } while (b >= wMinusOne || b < 2);
+                b = BigInteger.Zero.GenRandomBits(Two, wMinusOne, rng);
 
                 var z = BigInteger.ModPow(b, m, w);
                 if (z.IsOne || z == wMinusOne)
@@ -368,7 +375,7 @@ namespace Aprismatic
 
                 for (var j = 1; j < a; j++)
                 {
-                    z = BigInteger.ModPow(z, 2, w);
+                    z = BigInteger.ModPow(z, Two, w);
                     if (z.IsOne)
                         return false;
                     if (z == wMinusOne)
