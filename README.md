@@ -20,22 +20,22 @@ var bitCount = bi.BitCount(); // returns the position (int) of the most signific
                               // of the BigInteger's absolute value.
 
 var r1 = bi.ModInverse(bi2); // returns BigInteger x such that (bi * x) % bi2 == 1
-var r2 = bi.IsProbablePrime(8, rng) // returns true if bi is a probable prime, false otherwise
-                                    // confidence parameter 8 is the number of iterations to use
-                                    // in the Rabin-Miller test
+var r2 = bi.IsProbablePrime(8, rng); // returns true if bi is a probable prime, false otherwise
+                                     // confidence parameter 8 is the number of iterations to
+                                     // use in the Rabin-Miller (RM) test
 
 // C# currently doesn't support static extension methods, so we need to use the instance
 // method instead. We can use a pre-defined instance of the BigInteger class such as
 // `BigInteger.One` or any other instance that is already defined, in our case - `bi` or `bi2`
 
-var r3 = bi.GenPseudoPrime(128, 8, rng); // returns a BigInteger probable prime of 128 bits tested with
-                                         // 8 iterations of Rabin-Miller test; doesn't change `bi`
+var r3 = bi.GenPseudoPrime(128, 8, rng); // returns a BigInteger probable prime of 128 bits
+                                         // tested with 8 loops of RM test; doesn't change `bi`
 
-var r4 = bi.GenSafePseudoPrime(128, 8, rng); // same but returns a safe prime (i.e., a prime x such
-                                             // that (x-1)/2 is also prime)
+var r4 = bi.GenSafePseudoPrime(128, 8, rng); // same but returns a safe prime (i.e., a prime x
+                                             // such that (x-1)/2 is also prime)
 
-var r5 = bi.GenRandomBits(128, rng); // returns a BigInteger x with exaxctly 128 random bits, i.e.,
-                                     // such that x.BitCount() == 128
+var r5 = bi.GenRandomBits(128, rng); // returns a BigInteger x with exaxctly 128 random bits,
+                                     // i.e., such that x.BitCount() == 128
 var r6 = bi.GenRandomBits(bi, bi2, rng); // return a random BigInteger x such that bi ≤ x < bi2
 ```
 
