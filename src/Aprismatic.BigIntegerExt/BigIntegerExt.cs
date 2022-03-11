@@ -274,7 +274,7 @@ namespace Aprismatic
         /// </remarks>
         /// <param name="confidence">Number of chosen bases</param>
         /// <param name="rng">RandomNumberGenerator object</param>
-        /// <param name="bitLength"></param>
+        /// <param name="bitLength">Bit length of T (if not provided, the method calculates it)</param>
         /// <returns>True if this is probably prime</returns>
         public static bool IsProbablePrime(this BigInteger T, int confidence, RandomNumberGenerator rng, int bitLength = -1)
         {
