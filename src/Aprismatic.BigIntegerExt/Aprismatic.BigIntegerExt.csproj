@@ -1,6 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>netstandard1.3;netstandard2.1</TargetFrameworks>
-    <Description>A set of extension methods for the .NET `System.Numerics.BigInteger` class, including methods like `ModInverse`, `GenPseudoPrime`, `GenRandomBits` (using cryptographically strong RNG), `IsProbablePrime` (implemented using Rabin-Miller test).</Description>
+    <Description>A set of extension methods for the .NET `System.Numerics.BigInteger` class, including methods like `BitCount`, `ModInverse`, `GenPseudoPrime`, `GenSafePseudoPrime`, `GenRandomBits` (using cryptographically strong RNG), `IsProbablePrime` (implemented using Rabin-Miller test). This library is provided free of charge under the MIT license. Contributions are welcome.</Description>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
   </PropertyGroup>
 </Project>

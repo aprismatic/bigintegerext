@@ -15,6 +15,11 @@ using System.Security.Cryptography;
 
 namespace Aprismatic
 {
+    /// <summary>
+    /// A static class that provides extension methods for the BigInteger class,
+    /// including: <c>BitCount</c>, <c>ModInverse</c>, <c>GenPseudoPrime</c>,
+    /// <c>GenSafePseudoPrime</c>, <c>GenRandomBits</c>, and <c>IsProbablePrime</c>.
+    /// </summary>
     public static partial class BigIntegerExt
     {
         private static BigInteger Two = new BigInteger(2);
@@ -22,8 +27,9 @@ namespace Aprismatic
         /// <summary>
         /// Calculates the modulo inverse of `this`.
         /// </summary>
+        /// <param name="T">BigInteger to calculate modulo inverse of</param>
         /// <param name="mod">Modulo</param>
-        /// <returns>Modulo inverse of `this`; or 1 if mod.inv. does not exist.</returns>
+        /// <returns>Modulo inverse of `this`; or 1 if mod.inv. does not exist</returns>
         public static BigInteger ModInverse(this BigInteger T, BigInteger mod)
         {
             BigInteger i = mod, v = BigInteger.Zero, d = BigInteger.One, t, x;
@@ -80,6 +86,7 @@ namespace Aprismatic
         /// The lower bound is inclusive, and the upper bound is exclusive.
         /// Code is based upon this StackOverflow answer: https://stackoverflow.com/a/68593532/664178
         /// </summary>
+        /// <param name="T">This parameter is irrelevant, required due to lack of static extension methods in C#</param>
         /// <param name="minValue">Inclusive lower bound</param>
         /// <param name="maxValue">Exclusive upper bound</param>
         /// <param name="rng">Random number generator to use</param>
@@ -114,6 +121,7 @@ namespace Aprismatic
         /// <summary>
         /// Returns a random BigInteger of exactly the specified bit length using the provided RNG
         /// </summary>
+        /// <param name="T">This parameter is irrelevant, required due to lack of static extension methods in C#</param>
         /// <param name="bits">Bit length of random BigInteger to generate</param>
         /// <param name="rng">RandomNumberGenerator object</param>
         /// <exception cref="ArgumentOutOfRangeException">`bits` must be > 0</exception>
@@ -159,6 +167,7 @@ namespace Aprismatic
         /// <summary>
         /// Generates a random probable prime positive BigInteger of exactly the specified bit length using the provided RNG
         /// </summary>
+        /// <param name="T">This parameter is irrelevant, required due to lack of static extension methods in C#</param>
         /// <param name="bits">Bit length of prime to generate; has to be greater than 1</param>
         /// <param name="confidence">Number of chosen bases</param>
         /// <param name="rng">RandomNumberGenerator object</param>
@@ -186,6 +195,7 @@ namespace Aprismatic
         /// This method uses the Combined Sieve approach to improve performance as compared to naive algorithm.
         /// See Michael Wiener ``Safe Prime Generation with a Combined Sieve'', 2003 (https://eprint.iacr.org/2003/186)
         /// </summary>
+        /// <param name="T">This parameter is irrelevant, required due to lack of static extension methods in C#</param>
         /// <param name="bits">Bit length of prime to generate</param>
         /// <param name="confidence">Number of chosen bases</param>
         /// <param name="rng">RandomNumberGenerator object</param>
@@ -270,8 +280,9 @@ namespace Aprismatic
         /// </summary>
         /// <remarks>
         /// Before applying the test, the number is tested for divisibility by X first primes.
-        /// X was determined for different number of bits and is used as a constant.
+        /// Different amounts X were determined for different bit lengths and are used as a constant.
         /// </remarks>
+        /// <param name="T">BigInteger to check for primality</param>
         /// <param name="confidence">Number of chosen bases</param>
         /// <param name="rng">RandomNumberGenerator object</param>
         /// <param name="bitLength">Bit length of T (if not provided, the method calculates it)</param>
@@ -336,8 +347,8 @@ namespace Aprismatic
 
         /// <summary>
         /// Probabilistic prime test based on Miller-Rabin's algorithm.
-        /// Algorithm based on http://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.186-4.pdf (p. 72)
-        /// This method REQUIRES that the BigInteger is positive
+        /// Algorithm based on http://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.186-4.pdf (p. 72).
+        /// This method REQUIRES that the BigInteger is positive.
         /// </summary>
         /// <remarks>
         /// for any positive, odd p with p–1 = 2^s * t
@@ -348,7 +359,9 @@ namespace Aprismatic
         ///
         /// Otherwise, p is composite.
         /// </remarks>
+        /// <param name="w">BigInteger to check for primality</param>
         /// <param name="confidence">Number of rounds of RM algorithm to execute</param>
+        /// <param name="rng">RandomNumberGenerator object</param>
         /// <returns>True if this is a strong pseudoprime to randomly chosen bases</returns>
         public static bool RabinMillerTest(this BigInteger w, int confidence, RandomNumberGenerator rng)
         {

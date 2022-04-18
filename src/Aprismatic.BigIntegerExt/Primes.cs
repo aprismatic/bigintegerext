@@ -5,7 +5,9 @@ namespace Aprismatic
 {
     public static partial class BigIntegerExt
     {
-        // primes smaller than 1M to test the generated prime number (https://www.mathematical.com/primes0to1000k.html)
+        /// <summary>
+        /// A list of primes smaller than 1M, source: https://www.mathematical.com/primes0to1000k.html
+        /// </summary>
         public static readonly ulong[] PrimesBelow1M =
         {
             2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97, 101,
@@ -7678,6 +7680,9 @@ namespace Aprismatic
             999931, 999953, 999959, 999961, 999979, 999983
         };
 
+        /// <summary>
+        /// A list of primes smaller than 1M converted to BigInteger type, source: https://www.mathematical.com/primes0to1000k.html
+        /// </summary>
         public static readonly BigInteger[] PrimesBelow1M_BI = PrimesBelow1M.Select(x => new BigInteger(x)).ToArray();
     }
 }

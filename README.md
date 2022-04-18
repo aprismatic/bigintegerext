@@ -4,6 +4,12 @@
 
 A set of extension methods for the .NET `System.Numerics.BigInteger` class, including methods like `BitCount`, `ModInverse`, `GenPseudoPrime`, `GenSafePseudoPrime`, `GenRandomBits` (using cryptographically strong RNG), `IsProbablePrime` (implemented using Rabin-Miller test).
 
+### Installation
+
+`Aprismatic.BigIntegerExt` library is available in GitHub package repo as well as on NuGet.org: <https://www.nuget.org/packages/Aprismatic.BigIntegerExt/>.
+
+You can install it through NuGet package manager in Visual Studion or Rider or run `dotnet add package Aprismatic.BigIntegerExt`.
+
 ### Usage
 
 ```csharp
