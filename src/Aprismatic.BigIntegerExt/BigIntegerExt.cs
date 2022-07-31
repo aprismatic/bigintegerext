@@ -119,7 +119,7 @@ namespace Aprismatic
 
 
         /// <summary>
-        /// Returns a random BigInteger of exactly the specified bit length using the provided RNG
+        /// Returns a non-negative random BigInteger of exactly the specified bit length using the provided RNG
         /// </summary>
         /// <param name="T">This parameter is irrelevant, required due to lack of static extension methods in C#</param>
         /// <param name="bits">Bit length of random BigInteger to generate</param>
